@@ -36,13 +36,24 @@ public class MOVING : MonoBehaviour
 
     void HandleMouseLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 100f * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 100f * Time.deltaTime;
+        float mouseX =
+            Input.GetAxis("Mouse X") *
+            mouseSensitivity *
+            100f *
+            Time.deltaTime;
+
+        float mouseY =
+            Input.GetAxis("Mouse Y") *
+            mouseSensitivity *
+            100f *
+            Time.deltaTime;
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
 
-        cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        cameraPivot.localRotation =
+            Quaternion.Euler(xRotation, 0f, 0f);
+
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -51,20 +62,23 @@ public class MOVING : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        Vector3 move =
+            transform.right * x +
+            transform.forward * z;
 
         // Ground check
         if (controller.isGrounded)
         {
             if (yVelocity < 0)
             {
-                yVelocity = -2f; // keep player grounded
+                yVelocity = -2f;
             }
 
             // Jump
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                yVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                yVelocity =
+                    Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
         }
 
