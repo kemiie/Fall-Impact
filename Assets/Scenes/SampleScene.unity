@@ -371,7 +371,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8459761256327841958, guid: 8d33425d7a2a5394ba6dc22e7de6306c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4863,6 +4863,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 1417105201}
+    - target: {fileID: 4185705908281677169, guid: 8d33425d7a2a5394ba6dc22e7de6306c, type: 3}
+      propertyPath: shouldShowHealthNumbers
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7124862089273733780, guid: 8d33425d7a2a5394ba6dc22e7de6306c, type: 3}
       propertyPath: m_Text
       value: '100/100
@@ -4955,7 +4959,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8459761256327841958, guid: 8d33425d7a2a5394ba6dc22e7de6306c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
