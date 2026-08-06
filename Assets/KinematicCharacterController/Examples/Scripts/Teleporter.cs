@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using KinematicCharacterController.Examples;
 
 namespace KinematicCharacterController.Examples
 {
@@ -12,26 +9,50 @@ namespace KinematicCharacterController.Examples
 
         public UnityAction<ExampleCharacterController> OnCharacterTeleport;
 
-        public bool isBeingTeleportedTo { get; set; }
+        private bool _canTeleport = true;
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!isBeingTeleportedTo)
-            {
-                ExampleCharacterController cc = other.GetComponent<ExampleCharacterController>();
-                if (cc)
-                {
-                    cc.Motor.SetPositionAndRotation(TeleportTo.transform.position, TeleportTo.transform.rotation);
+            Debug.Log("Something entered: " + other.name);
 
-                    if (OnCharacterTeleport != null)
-                    {
-                        OnCharacterTeleport(cc);
-                    }
-                    TeleportTo.isBeingTeleportedTo = true;
-                }
+            if (!_canTeleport)
+                return;
+
+            CharacterController player = other.GetComponent<CharacterController>();
+
+            if (player == null)
+            {
+                Debug.Log("No CharacterController found!");
+                return;
             }
 
-            isBeingTeleportedTo = false;
+            if (TeleportTo == null)
+            {
+                Debug.Log("No TeleportTo assigned!");
+                return;
+            }
+
+            TeleportTo._canTeleport = false;
+
+            player.enabled = false;
+
+            player.transform.position = TeleportTo.transform.position;
+            player.transform.rotation = TeleportTo.transform.rotation;
+
+            player.enabled = true;
+
+            Debug.Log("TELEPORTED!");
+
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            _canTeleport = true;
+
+            if (TeleportTo != null)
+            {
+                TeleportTo._canTeleport = true;
+            }
         }
     }
 }
