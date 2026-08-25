@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d83f35e35b3a94ea2023d84e0d4a35, type: 3}
+  m_Name: New Quest
+  m_EditorClassIdentifier: 
+  questID: T92bbe6ff-63eb-49fd-b0ee-d9f3ce3d2f66
+  questName: TalkToNPC
+  description: Find the NPC and find him
+  objectives:
+  - objectiveID: 1
+    description: Find the NPC
+    type: 3
+    requiredAmount: 5
+    currentAmount: 0
