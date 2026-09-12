@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 50a9311a7afacd14f9ef4c46ff9d3e15
+AssetOrigin:
+  serializedVersion: 1
+  productId: 362908
+  packageName: Dialouge & Quest Pack - Extension Pack for BTGraph
+  packageVersion: 1.0
+  assetPath: Assets/BTGraphPacks/DialogueQuestPack/Runtime/Signals/GameSignalBus.cs
+  uploadId: 932920

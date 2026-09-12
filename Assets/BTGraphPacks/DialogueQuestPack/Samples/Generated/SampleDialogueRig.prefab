@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7746066703561656435
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 63175406523536046}
+  - component: {fileID: 575832434418405776}
+  - component: {fileID: 6072777775660472882}
+  - component: {fileID: 3391614996782813053}
+  - component: {fileID: 6358238695971320279}
+  - component: {fileID: 3659319036261284101}
+  - component: {fileID: 4369572081355134242}
+  m_Layer: 0
+  m_Name: SampleDialogueRig
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &63175406523536046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &575832434418405776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3d665c1315ff6940818f48d383c96e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.DialogueRunner
+  QuestServiceBlackboardKey: questService
+  AutoCreateDemoQuestService: 1
+  SignalBusBlackboardKey: gameSignals
+  LogLifecycle: 0
+--- !u!114 &6072777775660472882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dcb5d3a230131d4ba65059ec00feb42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.SimpleDialogueUI
+  Runner: {fileID: 575832434418405776}
+  SpeakerText: {fileID: 0}
+  LineText: {fileID: 0}
+  ContinueButton: {fileID: 0}
+  ChoicesRoot: {fileID: 0}
+  ChoiceButtonPrefab: {fileID: 0}
+  BuildIfMissing: 1
+--- !u!114 &3391614996782813053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c91383ec8347a54ea4411196e476d2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.SimpleQuestServiceComponent
+  EnablePersistence: 0
+  PersistenceKey: DialoguePack.SimpleQuestService
+  DontDestroy: 1
+--- !u!114 &6358238695971320279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea340e25a2edc5a40b79e73ab7a8e02c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.QuestServiceProvider
+  ServiceBehaviour: {fileID: 3391614996782813053}
+  AutoCreateDemoService: 1
+--- !u!114 &3659319036261284101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f164484ae341ed840bc0ee90517644a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.SampleQuestNpcController
+  Runner: {fileID: 575832434418405776}
+  DialogueTree: {fileID: 11400000, guid: a9d903e7d0e20f340adf88b5057dabd9, type: 2}
+  StartDialogueKey: 101
+  SpeakerId: NPC
+--- !u!114 &4369572081355134242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7746066703561656435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5718f76be3e73dc40a7a6ecd30fed05b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BTGraph.DialogueQuest.Runtime::DialoguePack.Runtime.SampleQuestTurnInTrigger
+  TriggerKey: 116
+  EventId: sample.turnin
+  QuestId: sample.fetch_herbs
+  Payload: player_returned
+  Provider: {fileID: 6358238695971320279}

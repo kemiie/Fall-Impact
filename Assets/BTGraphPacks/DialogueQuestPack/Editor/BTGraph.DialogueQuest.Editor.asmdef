@@ -1,0 +1,23 @@
+{
+  "name": "BTGraph.DialogueQuest.Editor",
+  "rootNamespace": "DialoguePack.Editor",
+  "references": [
+    "BTGraph.DialogueQuest.Runtime",
+    "BTGraph.DialogueQuest.Samples",
+    "GUID:b3a1fa5d056a450eb2cd894891734688",
+    "GUID:cded65ee680a4065933b6b5e842a8cac",
+    "UnityEngine.UI",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

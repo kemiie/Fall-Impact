@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 05350cd8dc8705e4faf8a1b531347382
+AssetOrigin:
+  serializedVersion: 1
+  productId: 362908
+  packageName: Dialouge & Quest Pack - Extension Pack for BTGraph
+  packageVersion: 1.0
+  assetPath: Assets/BTGraphPacks/DialogueQuestPack/Runtime/Quest/QuestServiceResolver.cs
+  uploadId: 932920

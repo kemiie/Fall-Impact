@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2c7133bc7b635654b84107af180a8b72
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 362908
+  packageName: Dialouge & Quest Pack - Extension Pack for BTGraph
+  packageVersion: 1.0
+  assetPath: Assets/BTGraphPacks/DialogueQuestPack/Samples/Generated/DialoguePackDemoTree.asset
+  uploadId: 932920

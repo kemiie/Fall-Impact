@@ -1,0 +1,17 @@
+{
+  "name": "BTGraph.DialogueQuest.Runtime",
+  "rootNamespace": "DialoguePack.Runtime",
+  "references": [
+    "GUID:b3a1fa5d056a450eb2cd894891734688",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

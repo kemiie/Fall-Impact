@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4ba82445cf649b5b853bd074fb54a22, type: 3}
+  m_Name: SampleQuestDialogue
+  m_EditorClassIdentifier: Assembly-CSharp::BTs.Runtime.BTAsset
+  assetVersion: 1
+  ExecutionModeOverride: 0
+  RootGUID: 3cbdcd8c243d4992a20074c631f2b8c3
+  _blackboardKeys: []
+  _commentBoxes: []
+  _debugBreakpoints: []
+  _debugFailureBreakpoints: []
+  _suppressedLintRules: []
+  _runtimeGuid: a9d903e7d0e20f340adf88b5057dabd9
+  Nodes:
+  - Name: Quest Flow
+    guid: 3cbdcd8c243d4992a20074c631f2b8c3
+    TypeId: BTs.Runtime.SequenceNode, BTGraph.Shared.Runtime
+    Position: {x: 300, y: 80}
+    DataJson: '{}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Start Dialogue
+    guid: 4e3f02f983584438892503c922d7fe74
+    TypeId: DialoguePack.Runtime.DialogueStartNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 80, y: 280}
+    DataJson: '{"SpeakerId":"NPC","SpeakerBlackboardKey":"dialogue.speaker","LockInputOnStart":false,"LockCameraOnStart":false,"StartSignalId":"","SignalBusKey":"gameSignals"}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Offer Line
+    guid: 2d0d227eb1904b91acfd6a6d8a862e42
+    TypeId: DialoguePack.Runtime.DialogueLineNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 280, y: 280}
+    DataJson: '{"SpeakerId":"NPC","SpeakerBlackboardKey":"dialogue.speaker","Text":"Can
+      you gather three herbs for me?","Tags":"","AudioKey":""}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Await Continue
+    guid: 87f3ee6863f643ba98c039c4a0fd1b7b
+    TypeId: DialoguePack.Runtime.DialogueAwaitInputNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 480, y: 280}
+    DataJson: '{"TimeoutSeconds":0.0,"TimeoutOutcome":0}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Offer Quest
+    guid: 6c34e70d31ec46539661c4c9426b50b5
+    TypeId: DialoguePack.Runtime.QuestOfferNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 680, y: 280}
+    DataJson: '{"QuestServiceKey":"questService","AutoCreateDemoQuestService":true,"QuestId":"sample.fetch_herbs","QuestIdAsset":{"instanceID":0},"JournalEntry":"Gather
+      three herbs and return to the NPC."}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Objective Line
+    guid: d4dca4c4477145ab8c02dd97a132b85c
+    TypeId: DialoguePack.Runtime.DialogueLineNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 880, y: 280}
+    DataJson: '{"SpeakerId":"NPC","SpeakerBlackboardKey":"dialogue.speaker","Text":"Come
+      back when you have them. Press T to simulate turn-in.","Tags":"","AudioKey":""}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Await Continue
+    guid: 3f78f7bf545f4dad9964ae0634d23f04
+    TypeId: DialoguePack.Runtime.DialogueAwaitInputNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 1080, y: 280}
+    DataJson: '{"TimeoutSeconds":0.0,"TimeoutOutcome":0}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Wait Turn-In Event
+    guid: 8a5752fce33a445181aac32075b26d6f
+    TypeId: DialoguePack.Runtime.QuestWaitForEventNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 1280, y: 280}
+    DataJson: '{"QuestServiceKey":"questService","AutoCreateDemoQuestService":true,"QuestId":"sample.fetch_herbs","QuestIdAsset":{"instanceID":0},"EventId":"sample.turnin","EventIdAsset":{"instanceID":0},"MatchQuestId":true,"TimeoutSeconds":0.0,"TimeoutOutcome":0}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Turn-In Line
+    guid: 0447c194189a4c9298c3740a327e24e8
+    TypeId: DialoguePack.Runtime.DialogueLineNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 1480, y: 280}
+    DataJson: '{"SpeakerId":"NPC","SpeakerBlackboardKey":"dialogue.speaker","Text":"Perfect.
+      Here is your reward.","Tags":"","AudioKey":""}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Await Continue
+    guid: 849dcf580fb040c5818d6135416610e1
+    TypeId: DialoguePack.Runtime.DialogueAwaitInputNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 1680, y: 280}
+    DataJson: '{"TimeoutSeconds":0.0,"TimeoutOutcome":0}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: Complete Quest
+    guid: d713a1b7232449f48380eb1ebf4bbd60
+    TypeId: DialoguePack.Runtime.QuestCompleteNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 1880, y: 280}
+    DataJson: '{"QuestServiceKey":"questService","AutoCreateDemoQuestService":true,"QuestId":"sample.fetch_herbs","QuestIdAsset":{"instanceID":0}}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  - Name: End
+    guid: 0f3edafec3804cccaec9453d0fc095a5
+    TypeId: DialoguePack.Runtime.DialogueEndNode, BTGraph.DialogueQuest.Runtime
+    Position: {x: 2080, y: 280}
+    DataJson: '{"Result":0}'
+    DataVersion: 1
+    SubtreeAsset: {fileID: 0}
+    IsCollapsed: 0
+  Edges:
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 4e3f02f983584438892503c922d7fe74
+    PortIndex: 0
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 2d0d227eb1904b91acfd6a6d8a862e42
+    PortIndex: 1
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 87f3ee6863f643ba98c039c4a0fd1b7b
+    PortIndex: 2
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 6c34e70d31ec46539661c4c9426b50b5
+    PortIndex: 3
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: d4dca4c4477145ab8c02dd97a132b85c
+    PortIndex: 4
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 3f78f7bf545f4dad9964ae0634d23f04
+    PortIndex: 5
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 8a5752fce33a445181aac32075b26d6f
+    PortIndex: 6
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 0447c194189a4c9298c3740a327e24e8
+    PortIndex: 7
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 849dcf580fb040c5818d6135416610e1
+    PortIndex: 8
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: d713a1b7232449f48380eb1ebf4bbd60
+    PortIndex: 9
+  - ParentGuid: 3cbdcd8c243d4992a20074c631f2b8c3
+    ChildGuid: 0f3edafec3804cccaec9453d0fc095a5
+    PortIndex: 10
+  Groups: []
+  Comments: []

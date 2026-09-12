@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f0baea82a8b64b109a2aa2c4ca4153dd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 362908
+  packageName: Dialouge & Quest Pack - Extension Pack for BTGraph
+  packageVersion: 1.0
+  assetPath: Assets/BTGraphPacks/DialogueQuestPack/Editor/Setup/BTGraphDependencyCheck.cs
+  uploadId: 932920

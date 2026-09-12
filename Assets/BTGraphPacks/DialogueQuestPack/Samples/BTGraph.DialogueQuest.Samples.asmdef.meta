@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e0ae1d8b8e0d4663848b6d61d6260ecc
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 362908
+  packageName: Dialouge & Quest Pack - Extension Pack for BTGraph
+  packageVersion: 1.0
+  assetPath: Assets/BTGraphPacks/DialogueQuestPack/Samples/BTGraph.DialogueQuest.Samples.asmdef
+  uploadId: 932920
