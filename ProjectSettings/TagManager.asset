@@ -6,6 +6,8 @@ TagManager:
   tags:
   - water
   - Water
+  - Coins
+  - NPC
   layers:
   - Default
   - TransparentFX
