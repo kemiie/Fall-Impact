@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3ebcd12a3c6aec54e932e0d873610635
+timeCreated: 1501247854
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95327
+  packageName: Simple Character Selector
+  packageVersion: 2.0
+  assetPath: Assets/Character Selector/Prefabs/select.prefab
+  uploadId: 240211

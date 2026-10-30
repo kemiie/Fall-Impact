@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 923d5385b355c8a4280ba90f407ee665
+timeCreated: 1501245586
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95327
+  packageName: Simple Character Selector
+  packageVersion: 2.0
+  assetPath: Assets/Character Selector/Import/Cat/Materials/Material.014.mat
+  uploadId: 240211

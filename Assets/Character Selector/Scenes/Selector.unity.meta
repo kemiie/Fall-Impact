@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f2fbc928757cf6f449fba88140380f9a
+timeCreated: 1499794158
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95327
+  packageName: Simple Character Selector
+  packageVersion: 2.0
+  assetPath: Assets/Character Selector/Scenes/Selector.unity
+  uploadId: 240211
