@@ -8,6 +8,8 @@ public class ChestExploration : MonoBehaviour
 
     private bool opened;
 
+    public bool IsOpened => opened;
+
     public void OpenChest()
     {
         if (opened) return;

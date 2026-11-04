@@ -24,13 +24,15 @@ public class ShopSystem : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(Cursor.lockState == CursorLockMode.Locked)
+            if (Cursor.lockState == CursorLockMode.Locked)
             {
                 Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
-            else if(Cursor.lockState == CursorLockMode.None)
+            else
             {
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
             }
         }
     }
@@ -40,6 +42,12 @@ public class ShopSystem : MonoBehaviour
     {
         bool close = !shopPanel.activeSelf;
         shopPanel.SetActive(close);
+
+        if (close)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
     // BUY SWORD
     public void BuySword()

@@ -35,6 +35,13 @@ public class ExplorationManager : MonoBehaviour
         new List<DiscoveryRecord>();
 
     public event Action OnExplorationChanged;
+    public bool IsDiscovered(string regionID, string objectID)
+    {
+        return discoveries.Exists(record =>
+            record.regionID == regionID &&
+            record.objectID == objectID
+        );
+    }
 
     private const string SaveKey = "ExplorationProgress";
 
