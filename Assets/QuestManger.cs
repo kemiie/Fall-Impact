@@ -1,26 +1,71 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
-[System.Serializable]
-
-public class CurrentQuest
+public class QuestManager : MonoBehaviour
 {
-    public string QuestGiverName;
-    public ItemType CurrentQuestItem;
-    public int questCount;
-}
+    public static QuestManager Instance;
 
-public class QuestManger : MonoBehaviour
-{
-    public CurrentQuest quest;
-    public void OnTriggerEnter(Collider other)
+    [Header("Quest Progress")]
+    public int fragmentsCollected = 0;
+    public int fragmentsRequired = 3;
+    public bool questCompleted = false;
+
+    [Header("Quest Rewards")]
+    public int rewardExperience = 100;
+    public int rewardCoins = 50;
+
+    [Header("Player Progression")]
+    public PlayerProgression progression;
+
+    private bool rewardClaimed = false;
+
+    private void Awake()
     {
-        if (other.gameObject.tag == "NPC")
+        if (Instance != null && Instance != this)
         {
-            NPC npc = other.GetComponent<NPC>();
-            quest.QuestGiverName = npc.name;
-            quest.CurrentQuestItem = npc.quest.QuestItem;
-            quest.questCount = npc.quest.QuestItemAmount;
+            Debug.LogError("Duplicate QuestManager found!");
+            return;
+        }
+
+        Instance = this;
+    }
+
+    public void CollectFragment()
+    {
+        if (questCompleted) return;
+
+        fragmentsCollected++;
+
+        Debug.Log("Fragments: " +
+            fragmentsCollected + "/" + fragmentsRequired);
+
+        if (fragmentsCollected >= fragmentsRequired)
+        {
+            CompleteQuest();
+        }
+    }
+
+    private void CompleteQuest()
+    {
+        questCompleted = true;
+
+        Debug.Log("QUEST COMPLETED!");
+
+        if (!rewardClaimed && progression != null)
+        {
+            rewardClaimed = true;
+
+            Debug.Log("Giving rewards!");
+
+            progression.AwardReward(
+                rewardExperience,
+                rewardCoins
+            );
+        }
+        else if (progression == null)
+        {
+            Debug.LogError(
+                "PlayerProgression is not assigned!"
+            );
         }
     }
 }
