@@ -1,7 +1,6 @@
 
-using UnityEngine;
 
-uusing UnityEngine;
+using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
@@ -25,7 +24,7 @@ public class QuestManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogError("Duplicate QuestManager found!");
+            Debug.LogError("Duplicate QuestManager!");
             return;
         }
 
@@ -38,11 +37,9 @@ public class QuestManager : MonoBehaviour
 
         fragmentsCollected++;
 
-        Debug.Log(
-            "Fragments: " +
+        Debug.Log("Fragments: " +
             fragmentsCollected + "/" +
-            fragmentsRequired
-        );
+            fragmentsRequired);
 
         if (fragmentsCollected >= fragmentsRequired)
         {
@@ -56,20 +53,44 @@ public class QuestManager : MonoBehaviour
 
         Debug.Log("QUEST COMPLETED!");
 
-        if (!rewardClaimed && levelSystem != null)
-        {
-            rewardClaimed = true;
+        GiveRewards();
+    }
 
-            levelSystem.AddEXP(rewardExperience);
-            levelSystem.AddCoins(rewardCoins);
+    private void GiveRewards()
+    {
+        if (rewardClaimed) return;
 
-            Debug.Log("Quest rewards received!");
-        }
-        else if (levelSystem == null)
+        if (levelSystem == null)
         {
-            Debug.LogError(
-                "LevelSystem is not assigned!"
-            );
+            Debug.LogError("LevelSystem is not assigned!");
+            return;
         }
+
+        levelSystem.AddEXP(rewardExperience);
+        levelSystem.AddCoins(rewardCoins);
+
+        rewardClaimed = true;
+
+        Debug.Log("REWARDS GIVEN: +" +
+            rewardExperience + " EXP, +" +
+            rewardCoins + " Coins!");
+    }
+
+    public string GetQuestDisplayText()
+    {
+        if (questCompleted)
+        {
+            return "FORGOTTEN MEADOW\n\n" +
+                "Collect magical fragments\n\n" +
+                fragmentsCollected + " / " + fragmentsRequired +
+                "\n\nQUEST COMPLETED!\n" +
+                "Rewards automatically received!";
+        }
+
+        return "FORGOTTEN MEADOW\n\n" +
+            "Collect magical fragments\n\n" +
+            fragmentsCollected + " / " + fragmentsRequired +
+            "\n\nReward: " + rewardExperience +
+            " EXP · " + rewardCoins + " Coins";
     }
 }
