@@ -12,9 +12,12 @@ public class PlayerProgression : MonoBehaviour
     [Header("Level Settings")]
     public int baseExperienceRequired = 100;
 
-    [Header("Notification")]
+    [Header("UI Text References")]
+    public TMP_Text levelText;
+    public TMP_Text experienceText;
+    public TMP_Text coinsText;
     public TMP_Text notificationText;
-
+    public TMP_Text explorationText;
     private Coroutine notificationRoutine;
 
     private void Start()

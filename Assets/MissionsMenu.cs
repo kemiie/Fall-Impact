@@ -9,51 +9,64 @@ public class MissionMenu : MonoBehaviour
     public Button missionsButton;
     public Button closeButton;
 
-    [Header("Mission Text")]
+    [Header("Quest Display")]
     public TMP_Text objectiveText;
 
-    [Header("Quest")]
+    [Header("Quest Manager")]
     public QuestManager questManager;
 
-    void Start()
+    private void Start()
     {
-        // Hide missions when the game starts
-        missionPanel.SetActive(false);
+        if (missionPanel != null)
+            missionPanel.SetActive(false);
 
-        // Connect the buttons
-        missionsButton.onClick.AddListener(ToggleMissions);
-        closeButton.onClick.AddListener(CloseMissions);
+        if (missionsButton != null)
+            missionsButton.onClick.AddListener(ToggleMissions);
+
+        if (closeButton != null)
+            closeButton.onClick.AddListener(CloseMissions);
+
+        UpdateQuestDisplay();
     }
 
-    void Update()
+    private void Update()
     {
-        // Update the mission progress
-        if (questManager != null && objectiveText != null)
+        if (missionPanel != null && missionPanel.activeSelf)
         {
-            if (questManager.questCompleted)
-            {
-                objectiveText.text =
-                    "QUEST COMPLETED!\n\n" +
-                    "You restored the Forgotten Meadow!";
-            }
-            else
-            {
-                objectiveText.text =
-                    "OBJECTIVES\n\n" +
-                    "Find magical fragments\n" +
-                    "(" + questManager.fragmentsCollected +
-                    "/" + questManager.fragmentsRequired + ")";
-            }
+            UpdateQuestDisplay();
         }
+    }
+
+    public void UpdateQuestDisplay()
+    {
+        if (questManager == null || objectiveText == null)
+            return;
+
+        objectiveText.text =
+            questManager.GetQuestDisplayText();
     }
 
     public void ToggleMissions()
     {
+        if (missionPanel == null) return;
+
         missionPanel.SetActive(!missionPanel.activeSelf);
+
+        UpdateQuestDisplay();
     }
 
     public void CloseMissions()
     {
-        missionPanel.SetActive(false);
+        if (missionPanel != null)
+            missionPanel.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        if (missionsButton != null)
+            missionsButton.onClick.RemoveListener(ToggleMissions);
+
+        if (closeButton != null)
+            closeButton.onClick.RemoveListener(CloseMissions);
     }
 }

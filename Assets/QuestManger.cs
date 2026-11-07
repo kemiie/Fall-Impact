@@ -1,4 +1,7 @@
+
 using UnityEngine;
+
+uusing UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
@@ -14,7 +17,7 @@ public class QuestManager : MonoBehaviour
     public int rewardCoins = 50;
 
     [Header("Player Progression")]
-    public PlayerProgression progression;
+    public LevelSystem levelSystem;
 
     private bool rewardClaimed = false;
 
@@ -35,8 +38,11 @@ public class QuestManager : MonoBehaviour
 
         fragmentsCollected++;
 
-        Debug.Log("Fragments: " +
-            fragmentsCollected + "/" + fragmentsRequired);
+        Debug.Log(
+            "Fragments: " +
+            fragmentsCollected + "/" +
+            fragmentsRequired
+        );
 
         if (fragmentsCollected >= fragmentsRequired)
         {
@@ -50,21 +56,19 @@ public class QuestManager : MonoBehaviour
 
         Debug.Log("QUEST COMPLETED!");
 
-        if (!rewardClaimed && progression != null)
+        if (!rewardClaimed && levelSystem != null)
         {
             rewardClaimed = true;
 
-            Debug.Log("Giving rewards!");
+            levelSystem.AddEXP(rewardExperience);
+            levelSystem.AddCoins(rewardCoins);
 
-            progression.AwardReward(
-                rewardExperience,
-                rewardCoins
-            );
+            Debug.Log("Quest rewards received!");
         }
-        else if (progression == null)
+        else if (levelSystem == null)
         {
             Debug.LogError(
-                "PlayerProgression is not assigned!"
+                "LevelSystem is not assigned!"
             );
         }
     }

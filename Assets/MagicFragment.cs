@@ -20,11 +20,11 @@ public class MagicFragment : MonoBehaviour
             Vector3.up * rotationSpeed * Time.deltaTime
         );
 
-        float newY = Mathf.Sin(Time.time * floatSpeed)
-                     * floatHeight;
+        float newY =
+            Mathf.Sin(Time.time * floatSpeed) * floatHeight;
 
-        transform.position = startPosition
-                             + Vector3.up * newY;
+        transform.position =
+            startPosition + Vector3.up * newY;
     }
 
     void OnTriggerEnter(Collider other)
@@ -33,6 +33,12 @@ public class MagicFragment : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
+            if (QuestManager.Instance == null)
+            {
+                Debug.LogError("QuestManager not found!");
+                return;
+            }
+
             collected = true;
 
             QuestManager.Instance.CollectFragment();
