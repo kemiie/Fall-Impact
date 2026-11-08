@@ -7,7 +7,6 @@ public class LevelSystem : MonoBehaviour
 {
     [Header("Player Progress")]
     public int totalEXP = 0;
-    public int totalCoins = 0;
     public int currentLevel = 1;
 
     [Header("Level Settings")]
@@ -16,6 +15,11 @@ public class LevelSystem : MonoBehaviour
         0, 300, 700, 1200, 1800,
         2500, 3300, 4200, 5200, 6300
     };
+
+    [Header("Level Rewards")]
+    public int level2Reward = 200;
+
+    private bool level2RewardClaimed = false;
 
     [Header("Level Menu")]
     public GameObject levelPanel;
@@ -76,17 +80,23 @@ public class LevelSystem : MonoBehaviour
     {
         if (amount <= 0) return;
 
-        totalCoins += amount;
+        if (MoneySystem.Instance != null)
+            MoneySystem.Instance.money += amount;
 
         UpdateLevel();
     }
 
     public bool SpendCoins(int amount)
     {
-        if (amount <= 0 || totalCoins < amount)
+        if (amount <= 0) return false;
+
+        if (MoneySystem.Instance == null)
             return false;
 
-        totalCoins -= amount;
+        if (MoneySystem.Instance.money < amount)
+            return false;
+
+        MoneySystem.Instance.money -= amount;
 
         UpdateLevel();
 
@@ -109,12 +119,20 @@ public class LevelSystem : MonoBehaviour
                 break;
         }
 
-        if (newLevel > currentLevel)
-        {
-            Debug.Log("LEVEL UP! Level " + newLevel);
-        }
-
         currentLevel = newLevel;
+
+        if (currentLevel >= 2 && !level2RewardClaimed)
+        {
+            level2RewardClaimed = true;
+
+            if (MoneySystem.Instance != null)
+            {
+                MoneySystem.Instance.money += level2Reward;
+            }
+
+            Debug.Log("LEVEL 2 REWARD! +" +
+                level2Reward + " COINS!");
+        }
 
         int currentRequirement =
             levelRequirements[currentLevel - 1];
@@ -130,7 +148,11 @@ public class LevelSystem : MonoBehaviour
             levelText.text = "Level " + currentLevel;
 
         if (coinsText != null)
-            coinsText.text = totalCoins.ToString();
+        {
+            coinsText.text = MoneySystem.Instance != null
+                ? MoneySystem.Instance.money.ToString()
+                : "0";
+        }
 
         if (maxLevel)
         {
@@ -159,10 +181,7 @@ public class LevelSystem : MonoBehaviour
             nextRequirement - currentRequirement;
 
         if (expText != null)
-        {
-            expText.text =
-                expIntoLevel + " / " + expNeeded + " EXP";
-        }
+            expText.text = expIntoLevel + " / " + expNeeded + " EXP";
 
         if (currentEXPText != null)
             currentEXPText.text = expIntoLevel.ToString();
@@ -171,16 +190,11 @@ public class LevelSystem : MonoBehaviour
             requiredEXPText.text = expNeeded.ToString();
 
         if (nextLevelText != null)
-        {
             nextLevelText.text =
                 (nextRequirement - totalEXP) +
                 " EXP until next level";
-        }
 
         if (expBar != null)
-        {
-            expBar.value =
-                (float)expIntoLevel / expNeeded;
-        }
+            expBar.value = (float)expIntoLevel / expNeeded;
     }
 }

@@ -1,30 +1,27 @@
-
-
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance;
 
-    [Header("Quest Progress")]
+    [Header("Quest 1 - Forgotten Meadow")]
     public int fragmentsCollected = 0;
     public int fragmentsRequired = 3;
-    public bool questCompleted = false;
+    public bool firstQuestCompleted = false;
 
-    [Header("Quest Rewards")]
-    public int rewardExperience = 100;
-    public int rewardCoins = 50;
+    [Header("Quest 2 - Hidden Treasure")]
+    public int chestsCollected = 0;
+    public int chestsRequired = 3;
+    public bool secondQuestCompleted = false;
 
     [Header("Player Progression")]
     public LevelSystem levelSystem;
-
-    private bool rewardClaimed = false;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogError("Duplicate QuestManager!");
+            Destroy(gameObject);
             return;
         }
 
@@ -33,64 +30,78 @@ public class QuestManager : MonoBehaviour
 
     public void CollectFragment()
     {
-        if (questCompleted) return;
+        if (firstQuestCompleted) return;
 
         fragmentsCollected++;
 
         Debug.Log("Fragments: " +
-            fragmentsCollected + "/" +
-            fragmentsRequired);
+            fragmentsCollected + "/" + fragmentsRequired);
 
         if (fragmentsCollected >= fragmentsRequired)
         {
-            CompleteQuest();
+            firstQuestCompleted = true;
+
+            Debug.Log("FORGOTTEN MEADOW COMPLETED!");
+
+            GiveRewards(100, 50);
         }
     }
 
-    private void CompleteQuest()
+    public void CollectChest()
     {
-        questCompleted = true;
+        if (!firstQuestCompleted) return;
+        if (secondQuestCompleted) return;
 
-        Debug.Log("QUEST COMPLETED!");
+        chestsCollected++;
 
-        GiveRewards();
-    }
+        Debug.Log("Chests: " +
+            chestsCollected + "/" + chestsRequired);
 
-    private void GiveRewards()
-    {
-        if (rewardClaimed) return;
-
-        if (levelSystem == null)
+        if (chestsCollected >= chestsRequired)
         {
-            Debug.LogError("LevelSystem is not assigned!");
-            return;
+            secondQuestCompleted = true;
+
+            Debug.Log("HIDDEN TREASURE COMPLETED!");
+
+            GiveRewards(250, 150);
         }
+    }
 
-        levelSystem.AddEXP(rewardExperience);
-        levelSystem.AddCoins(rewardCoins);
+    private void GiveRewards(int exp, int coins)
+    {
+        if (levelSystem != null)
+            levelSystem.AddEXP(exp);
+        else
+            Debug.LogError("LevelSystem is not assigned!");
 
-        rewardClaimed = true;
-
-        Debug.Log("REWARDS GIVEN: +" +
-            rewardExperience + " EXP, +" +
-            rewardCoins + " Coins!");
+        if (MoneySystem.Instance != null)
+            MoneySystem.Instance.money += coins;
+        else
+            Debug.LogError("MoneySystem not found!");
     }
 
     public string GetQuestDisplayText()
     {
-        if (questCompleted)
+        if (!firstQuestCompleted)
         {
             return "FORGOTTEN MEADOW\n\n" +
                 "Collect magical fragments\n\n" +
                 fragmentsCollected + " / " + fragmentsRequired +
-                "\n\nQUEST COMPLETED!\n" +
-                "Rewards automatically received!";
+                "\n\nReward: 100 EXP · 50 Coins";
         }
 
-        return "FORGOTTEN MEADOW\n\n" +
-            "Collect magical fragments\n\n" +
-            fragmentsCollected + " / " + fragmentsRequired +
-            "\n\nReward: " + rewardExperience +
-            " EXP · " + rewardCoins + " Coins";
+        if (!secondQuestCompleted)
+        {
+            return "HIDDEN TREASURE\n\n" +
+                "Find the hidden treasure chests!\n\n" +
+                "Chests Found: " +
+                chestsCollected + " / " + chestsRequired +
+                "\n\nReward: 250 EXP · 150 Coins";
+        }
+
+        return "HIDDEN TREASURE\n\n" +
+            "Find the hidden treasure chests!\n\n" +
+            chestsCollected + " / " + chestsRequired +
+            "\n\nALL QUESTS COMPLETED!";
     }
 }

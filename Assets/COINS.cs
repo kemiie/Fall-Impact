@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class COINS : MonoBehaviour
@@ -26,10 +27,6 @@ public class COINS : MonoBehaviour
         Debug.Log("Coin collected! Money: " +
                   MoneySystem.Instance.money);
 
-        // Make the coin disappear
-        gameObject.SetActive(false);
-
-        // Destroy it completely
         Destroy(gameObject);
     }
 }

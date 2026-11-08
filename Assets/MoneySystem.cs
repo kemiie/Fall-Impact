@@ -11,33 +11,32 @@ public class MoneySystem : MonoBehaviour
 
     private void Awake()
     {
-        // Check if an instance already exists
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // Self-destruct if a duplicate is found
+            Destroy(gameObject);
             return;
         }
 
         Instance = this;
 
-        // Optional: Keep this object alive across different scenes
         DontDestroyOnLoad(gameObject);
     }
 
-
     void Update()
     {
-        moneyText.text = "$ " + money;
+        if (moneyText != null)
+        {
+            moneyText.text = "$ " + money;
+        }
     }
 
     public bool SpendMoney(int amount)
     {
-        if (money >= amount)
-        {
-            money -= amount;
-            return true;
-        }
+        if (amount <= 0 || money < amount)
+            return false;
 
-        return false;
+        money -= amount;
+
+        return true;
     }
 }
