@@ -21,45 +21,23 @@ public class ShopManager : MonoBehaviour
     [Header("Companions")]
     public string[] threeStarCompanions =
     {
-        "Little Blue Spirit",
-        "Forest Butterfly",
-        "Tiny Star"
+        "Bird",
+        "Fish",
+        "Monkey"
     };
 
     public string[] fourStarCompanions =
     {
-        "Moonlight Fairy",
-        "Crystal Fox",
-        "Starlight Spirit"
+        "Lizard",
+        "Deer",
+        "Rat"
     };
 
     public string[] fiveStarCompanions =
     {
-        "Celestial Dragon",
-        "Eternal Star Fairy",
-        "Guardian of Dreams"
-    };
-
-    [Header("Outfits")]
-    public string[] threeStarOutfits =
-    {
-        "Traveler Outfit",
-        "Flower Dress",
-        "Casual Outfit"
-    };
-
-    public string[] fourStarOutfits =
-    {
-        "Moonlight Dress",
-        "Crystal Royalty",
-        "Forest Guardian"
-    };
-
-    public string[] fiveStarOutfits =
-    {
-        "Celestial Princess",
-        "Eternal Starlight",
-        "Heavenly Empress"
+        "Octopus",
+        "Rainbow Bird",
+        "Snake"
     };
 
     [Header("Wish Prices")]
@@ -111,19 +89,18 @@ public class ShopManager : MonoBehaviour
     {
         if (MoneySystem.Instance == null)
         {
-            Debug.LogError("MoneySystem not found!");
+            Debug.LogError("[SHOP ERROR] MoneySystem not found!");
             return false;
         }
 
-        if (MoneySystem.Instance.money < amount)
+        if (!MoneySystem.Instance.SpendMoney(amount))
         {
+            Debug.LogWarning("[SHOP] Not enough coins!");
             if (resultText != null)
                 resultText.text = "Not enough coins!";
 
             return false;
         }
-
-        MoneySystem.Instance.money -= amount;
 
         return true;
     }
@@ -133,13 +110,10 @@ public class ShopManager : MonoBehaviour
         if (!SpendMoney(singleWishPrice))
             return;
 
-        if (resultText != null)
-            resultText.text = "";
-
         string reward = RollReward();
 
         if (resultText != null)
-            resultText.text = "YOUR WISH:\n\n" + reward;
+            resultText.text = "YOUR WISH!\n\n" + reward;
 
         UpdateUI();
     }
@@ -149,9 +123,6 @@ public class ShopManager : MonoBehaviour
         if (!SpendMoney(tenWishPrice))
             return;
 
-        if (resultText != null)
-            resultText.text = "";
-
         StringBuilder results = new StringBuilder();
 
         results.AppendLine("✦ TEN WISHES ✦");
@@ -159,9 +130,7 @@ public class ShopManager : MonoBehaviour
 
         for (int i = 0; i < 10; i++)
         {
-            string reward = RollReward();
-
-            results.AppendLine((i + 1) + ". " + reward);
+            results.AppendLine((i + 1) + ". " + RollReward());
             results.AppendLine();
         }
 
@@ -180,25 +149,15 @@ public class ShopManager : MonoBehaviour
         int chance = Random.Range(0, 100);
 
         if (wishesSinceFiveStar >= fiveStarPityLimit)
-        {
             rarity = 5;
-        }
         else if (wishesSinceFourStar >= fourStarPityLimit)
-        {
             rarity = 4;
-        }
         else if (chance < 5)
-        {
             rarity = 5;
-        }
         else if (chance < 25)
-        {
             rarity = 4;
-        }
         else
-        {
             rarity = 3;
-        }
 
         if (rarity == 5)
         {
@@ -210,39 +169,36 @@ public class ShopManager : MonoBehaviour
             wishesSinceFourStar = 0;
         }
 
-        bool companion = Random.Range(0, 2) == 0;
+        string petName;
 
-        string itemName;
+        if (rarity == 5)
+            petName = GetRandom(fiveStarCompanions);
+        else if (rarity == 4)
+            petName = GetRandom(fourStarCompanions);
+        else
+            petName = GetRandom(threeStarCompanions);
 
-        if (companion)
+        if (PetManager.Instance == null)
         {
-            if (rarity == 5)
-                itemName = GetRandom(fiveStarCompanions);
-            else if (rarity == 4)
-                itemName = GetRandom(fourStarCompanions);
-            else
-                itemName = GetRandom(threeStarCompanions);
+            Debug.LogError("[SHOP ERROR] PetManager not found! Reward was not added.");
         }
         else
         {
-            if (rarity == 5)
-                itemName = GetRandom(fiveStarOutfits);
-            else if (rarity == 4)
-                itemName = GetRandom(fourStarOutfits);
-            else
-                itemName = GetRandom(threeStarOutfits);
+            PetManager.Instance.AddPet(petName, rarity);
+
+            Debug.Log("[SHOP SUCCESS] Pet awarded: " +
+                petName + " | Rarity: " + rarity);
         }
 
         return new string('★', rarity) +
             " " + rarity + " STAR\n" +
-            (companion ? "COMPANION: " : "OUTFIT: ") +
-            itemName;
+            "COMPANION: " + petName;
     }
 
     private string GetRandom(string[] items)
     {
         if (items == null || items.Length == 0)
-            return "Mystery Reward";
+            return "Mystery Companion";
 
         return items[Random.Range(0, items.Length)];
     }
