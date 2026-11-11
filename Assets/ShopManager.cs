@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,23 +20,17 @@ public class ShopManager : MonoBehaviour
     [Header("Companions")]
     public string[] threeStarCompanions =
     {
-        "Bird",
-        "Fish",
-        "Monkey"
+        "Bird", "Fish", "Monkey"
     };
 
     public string[] fourStarCompanions =
     {
-        "Lizard",
-        "Deer",
-        "Rat"
+        "Lizard", "Deer", "Rat"
     };
 
     public string[] fiveStarCompanions =
     {
-        "Octopus",
-        "Rainbow Bird",
-        "Snake"
+        "Octopus", "Rainbow Bird", "Snake"
     };
 
     [Header("Wish Prices")]
@@ -89,13 +82,12 @@ public class ShopManager : MonoBehaviour
     {
         if (MoneySystem.Instance == null)
         {
-            Debug.LogError("[SHOP ERROR] MoneySystem not found!");
+            Debug.LogError("[SHOP] MoneySystem not found!");
             return false;
         }
 
         if (!MoneySystem.Instance.SpendMoney(amount))
         {
-            Debug.LogWarning("[SHOP] Not enough coins!");
             if (resultText != null)
                 resultText.text = "Not enough coins!";
 
@@ -125,7 +117,7 @@ public class ShopManager : MonoBehaviour
 
         StringBuilder results = new StringBuilder();
 
-        results.AppendLine("✦ TEN WISHES ✦");
+        results.AppendLine("TEN WISHES");
         results.AppendLine();
 
         for (int i = 0; i < 10; i++)
@@ -178,16 +170,22 @@ public class ShopManager : MonoBehaviour
         else
             petName = GetRandom(threeStarCompanions);
 
-        if (PetManager.Instance == null)
+        // ADD PET TO COLLECTION
+        PetManager manager = PetManager.Instance;
+
+        if (manager == null)
         {
-            Debug.LogError("[SHOP ERROR] PetManager not found! Reward was not added.");
+            Debug.LogError("[SHOP] PetManager.Instance is NULL!");
         }
         else
         {
-            PetManager.Instance.AddPet(petName, rarity);
+            manager.AddPet(petName, rarity);
 
-            Debug.Log("[SHOP SUCCESS] Pet awarded: " +
-                petName + " | Rarity: " + rarity);
+            Debug.Log(
+                "[SHOP SUCCESS] Added " + petName +
+                " | Rarity: " + rarity +
+                " | Total owned: " + manager.petNames.Count
+            );
         }
 
         return new string('★', rarity) +
@@ -195,12 +193,12 @@ public class ShopManager : MonoBehaviour
             "COMPANION: " + petName;
     }
 
-    private string GetRandom(string[] items)
+    private string GetRandom(string[] companions)
     {
-        if (items == null || items.Length == 0)
+        if (companions == null || companions.Length == 0)
             return "Mystery Companion";
 
-        return items[Random.Range(0, items.Length)];
+        return companions[Random.Range(0, companions.Length)];
     }
 
     private void UpdateUI()
