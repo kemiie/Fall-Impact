@@ -1,8 +1,8 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
-using System.Text;
 
 [System.Serializable]
 public class GameInventorySlot
@@ -52,7 +52,6 @@ public class InventoryManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -85,23 +84,39 @@ public class InventoryManager : MonoBehaviour
 
     public void UpdateInventoryUI()
     {
-        if (PetManager.Instance == null)
+        PetManager manager = PetManager.Instance;
+
+        if (manager == null)
+        {
+            Debug.LogError("[INVENTORY] PetManager not found!");
             return;
+        }
+
+        Debug.Log(
+            "[INVENTORY] Owned pets: " +
+            manager.petNames.Count
+        );
 
         if (inventoryText != null)
         {
             inventoryText.text =
-                PetManager.Instance.GetPetCollectionText();
+                manager.GetPetCollectionText();
+        }
+        else
+        {
+            Debug.LogError(
+                "[INVENTORY] Inventory Text is not assigned!"
+            );
         }
 
         if (petIncomeText != null)
         {
             petIncomeText.text =
                 "EQUIPPED: " +
-                PetManager.Instance.GetEquippedCount() +
-                " / 3\n" +
-                "INCOME: " +
-                PetManager.Instance.GetCoinsPerMinute() +
+                manager.GetEquippedCount() +
+                " / " + manager.maxEquippedPets +
+                "\nINCOME: " +
+                manager.GetCoinsPerMinute() +
                 " COINS PER MINUTE";
         }
 
@@ -110,11 +125,23 @@ public class InventoryManager : MonoBehaviour
 
     private void CreatePetButtons()
     {
-        if (petButtonContainer == null ||
-            petButtonPrefab == null)
+        PetManager manager = PetManager.Instance;
+
+        if (manager == null)
+            return;
+
+        if (petButtonContainer == null)
         {
-            Debug.LogWarning(
-                "[INVENTORY] Pet button references missing!"
+            Debug.LogError(
+                "[INVENTORY] Pet Button Container is missing!"
+            );
+            return;
+        }
+
+        if (petButtonPrefab == null)
+        {
+            Debug.LogError(
+                "[INVENTORY] Pet Button Prefab is missing!"
             );
             return;
         }
@@ -127,9 +154,7 @@ public class InventoryManager : MonoBehaviour
 
         generatedButtons.Clear();
 
-        for (int i = 0;
-             i < PetManager.Instance.petNames.Count;
-             i++)
+        for (int i = 0; i < manager.petNames.Count; i++)
         {
             int petIndex = i;
 
@@ -143,35 +168,85 @@ public class InventoryManager : MonoBehaviour
             TMP_Text buttonText =
                 newButton.GetComponentInChildren<TMP_Text>();
 
-            string petName =
-                PetManager.Instance.petNames[i];
+            RefreshButtonText(
+                buttonText,
+                manager,
+                petIndex
+            );
 
-            bool equipped =
-                PetManager.Instance.equippedPets[i];
+            newButton.interactable = true;
 
-            if (buttonText != null)
-            {
-                buttonText.text = petName +
-                    (equipped ? " - UNEQUIP" : " - EQUIP");
-            }
+            newButton.onClick.RemoveAllListeners();
 
             newButton.onClick.AddListener(() =>
             {
-                PetManager manager = PetManager.Instance;
+                Debug.Log(
+                    "[BUTTON TEST] PET BUTTON CLICKED! " +
+                    manager.petNames[petIndex]
+                );
 
-                if (manager == null)
-                    return;
+                PetManager current = PetManager.Instance;
 
-                if (manager.equippedPets[petIndex])
+                if (current == null)
                 {
-                    manager.UnequipPet(petIndex);
+                    Debug.LogError(
+                        "[BUTTON ERROR] PetManager is missing!"
+                    );
+                    return;
+                }
+
+                if (petIndex < 0 ||
+                    petIndex >= current.petNames.Count)
+                {
+                    Debug.LogError(
+                        "[BUTTON ERROR] Invalid pet index!"
+                    );
+                    return;
+                }
+
+                if (current.equippedPets[petIndex])
+                {
+                    current.UnequipPet(petIndex);
                 }
                 else
                 {
-                    manager.EquipPet(petIndex);
+                    current.EquipPet(petIndex);
                 }
+
+                UpdateInventoryUI();
             });
         }
+
+        Debug.Log(
+            "[INVENTORY] Created " +
+            generatedButtons.Count +
+            " pet buttons."
+        );
+    }
+
+    private void RefreshButtonText(
+        TMP_Text buttonText,
+        PetManager manager,
+        int index)
+    {
+        if (buttonText == null)
+        {
+            Debug.LogError(
+                "[INVENTORY] Button has no TMP text child!"
+            );
+            return;
+        }
+
+        string petName = manager.petNames[index];
+
+        string rarity =
+            manager.GetRarityName(manager.petRarities[index]);
+
+        bool equipped = manager.equippedPets[index];
+
+        buttonText.text =
+            petName + " (" + rarity + ")\n" +
+            (equipped ? "UNEQUIP" : "EQUIP");
     }
 
     public bool AddItem(string itemName, string itemType)
@@ -204,5 +279,8 @@ public class InventoryManager : MonoBehaviour
 
         if (closeInventoryButton != null)
             closeInventoryButton.onClick.RemoveListener(CloseInventory);
+
+        if (Instance == this)
+            Instance = null;
     }
 }

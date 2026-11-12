@@ -2,42 +2,17 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class PetPrefabEntry
-{
-    public string petName;
-    public GameObject petPrefab;
-}
-
 public class PetManager : MonoBehaviour
 {
     public static PetManager Instance { get; private set; }
 
-    [Header("Pet Collection")]
+    [Header("Owned Pets")]
     public List<string> petNames = new List<string>();
     public List<int> petRarities = new List<int>();
     public List<bool> equippedPets = new List<bool>();
 
-    [Header("Pet Settings")]
+    [Header("Settings")]
     public int maxEquippedPets = 3;
-
-    [Header("Player")]
-    public Transform player;
-
-    [Header("Pet Models")]
-    public List<PetPrefabEntry> petPrefabs =
-        new List<PetPrefabEntry>();
-
-    [Header("Pet Positions")]
-    public Vector3[] petPositions =
-    {
-        new Vector3(-1f, 0.5f, -1f),
-        new Vector3(1f, 0.5f, -1f),
-        new Vector3(0f, 0.5f, -2f)
-    };
-
-    private List<GameObject> spawnedPets =
-        new List<GameObject>();
 
     private float coinTimer;
 
@@ -50,17 +25,12 @@ public class PetManager : MonoBehaviour
         }
 
         Instance = this;
-
-        FixPetLists();
-
-        DontDestroyOnLoad(gameObject);
+        FixLists();
     }
 
     private void Update()
     {
-        int income = GetCoinsPerMinute();
-
-        if (income <= 0)
+        if (GetCoinsPerMinute() <= 0)
             return;
 
         coinTimer += Time.deltaTime;
@@ -68,33 +38,20 @@ public class PetManager : MonoBehaviour
         if (coinTimer >= 60f)
         {
             int minutes = Mathf.FloorToInt(coinTimer / 60f);
-
             coinTimer -= minutes * 60f;
 
             if (MoneySystem.Instance != null)
             {
-                int reward = income * minutes;
-
+                int reward = GetCoinsPerMinute() * minutes;
                 MoneySystem.Instance.money += reward;
 
-                Debug.Log("[PET INCOME] +" +
-                    reward + " coins!");
+                Debug.Log("[PETS] Earned " + reward + " coins!");
             }
         }
     }
 
-    // REPAIR PET LISTS
-    private void FixPetLists()
+    private void FixLists()
     {
-        if (petNames == null)
-            petNames = new List<string>();
-
-        if (petRarities == null)
-            petRarities = new List<int>();
-
-        if (equippedPets == null)
-            equippedPets = new List<bool>();
-
         while (petRarities.Count < petNames.Count)
             petRarities.Add(3);
 
@@ -108,146 +65,63 @@ public class PetManager : MonoBehaviour
             equippedPets.RemoveAt(equippedPets.Count - 1);
     }
 
-    // ADD PET
     public void AddPet(string petName, int rarity)
     {
-        FixPetLists();
-
-        if (string.IsNullOrWhiteSpace(petName))
-        {
-            Debug.LogError("[PET ERROR] Invalid pet name!");
-            return;
-        }
+        FixLists();
 
         petNames.Add(petName);
         petRarities.Add(rarity);
         equippedPets.Add(false);
 
-        spawnedPets.Add(null);
-
-        Debug.Log("[PET ADDED] " + petName);
+        Debug.Log("[PETS] Collected " + petName);
 
         UpdateAllUI();
     }
 
-    // EQUIP PET
     public bool EquipPet(int index)
     {
-        FixPetLists();
+        FixLists();
 
         if (index < 0 || index >= petNames.Count)
-        {
-            Debug.LogError("[PET ERROR] Invalid pet index!");
             return false;
-        }
 
         if (equippedPets[index])
-        {
-            Debug.LogWarning("[PET ERROR] Already equipped!");
             return false;
-        }
 
         if (GetEquippedCount() >= maxEquippedPets)
         {
-            Debug.LogError("[PET ERROR] Maximum 3 pets equipped!");
+            Debug.Log("[PETS] Maximum equipped pets reached!");
             return false;
         }
 
         equippedPets[index] = true;
 
-        SpawnPet(index);
-
-        Debug.Log("[PET EQUIPPED] " + petNames[index]);
+        Debug.Log("[PETS] Equipped " + petNames[index]);
 
         UpdateAllUI();
-
         return true;
     }
 
-    // UNEQUIP PET
     public void UnequipPet(int index)
     {
-        FixPetLists();
+        FixLists();
 
         if (index < 0 || index >= petNames.Count)
-        {
-            Debug.LogError("[PET ERROR] Invalid pet index!");
             return;
-        }
 
         if (!equippedPets[index])
-        {
-            Debug.LogWarning("[PET ERROR] Pet is not equipped!");
             return;
-        }
 
         equippedPets[index] = false;
 
-        RemovePetVisual(index);
-
-        Debug.Log("[PET UNEQUIPPED] " + petNames[index]);
+        Debug.Log("[PETS] Unequipped " + petNames[index]);
 
         UpdateAllUI();
     }
 
-    // SPAWN PET MODEL
-    private void SpawnPet(int index)
-    {
-        if (player == null)
-        {
-            Debug.LogError("[PET ERROR] Player is not assigned!");
-            return;
-        }
-
-        PetPrefabEntry entry = petPrefabs.Find(
-            p => p.petName == petNames[index]
-        );
-
-        if (entry == null || entry.petPrefab == null)
-        {
-            Debug.LogWarning(
-                "[PET WARNING] No prefab assigned for " +
-                petNames[index]
-            );
-
-            return;
-        }
-
-        int positionIndex = GetEquippedCount() - 1;
-
-        Vector3 offset = petPositions.Length > 0
-            ? petPositions[positionIndex % petPositions.Length]
-            : Vector3.zero;
-
-        GameObject spawned = Instantiate(
-            entry.petPrefab,
-            player
-        );
-
-        spawned.transform.localPosition = offset;
-        spawned.transform.localRotation = Quaternion.identity;
-
-        while (spawnedPets.Count <= index)
-            spawnedPets.Add(null);
-
-        spawnedPets[index] = spawned;
-    }
-
-    // REMOVE PET MODEL
-    private void RemovePetVisual(int index)
-    {
-        if (index < spawnedPets.Count &&
-            spawnedPets[index] != null)
-        {
-            Destroy(spawnedPets[index]);
-            spawnedPets[index] = null;
-        }
-    }
-
-    // COUNT EQUIPPED PETS
     public int GetEquippedCount()
     {
-        FixPetLists();
+        FixLists();
 
         int count = 0;
 
@@ -260,10 +134,9 @@ public class PetManager : MonoBehaviour
         return count;
     }
 
-    // COINS PER MINUTE
     public int GetCoinsPerMinute()
     {
-        FixPetLists();
+        FixLists();
 
         int total = 0;
 
@@ -285,30 +158,6 @@ public class PetManager : MonoBehaviour
         return total;
     }
 
-    // INVENTORY DISPLAY
-    public string GetPetCollectionText()
-    {
-        FixPetLists();
-
-        string display = "YOUR COMPANIONS\n\n";
-
-        if (petNames.Count == 0)
-            return display + "No pets yet!";
-
-        for (int i = 0; i < petNames.Count; i++)
-        {
-            display += petNames[i] + "\n";
-            display += GetRarityName(petRarities[i]) + "\n";
-
-            display += equippedPets[i]
-                ? "EQUIPPED\n\n"
-                : "NOT EQUIPPED\n\n";
-        }
-
-        return display;
-    }
-
-    // RARITY NAMES
     public string GetRarityName(int rarity)
     {
         switch (rarity)
@@ -322,21 +171,33 @@ public class PetManager : MonoBehaviour
         }
     }
 
-    // REFRESH INVENTORY
-    public void UpdateAllUI()
+    public string GetPetCollectionText()
     {
-        FixPetLists();
+        FixLists();
 
-        if (InventoryManager.Instance != null)
+        if (petNames.Count == 0)
+            return "YOUR COMPANIONS\n\nNo pets collected yet!";
+
+        string result = "YOUR COMPANIONS\n\n";
+
+        for (int i = 0; i < petNames.Count; i++)
         {
-            InventoryManager.Instance.UpdateInventoryUI();
+            result += petNames[i] + "\n";
+            result += GetRarityName(petRarities[i]) + "\n\n";
         }
 
-        Debug.Log(
-            "[PET SYSTEM] Equipped: " +
-            GetEquippedCount() + "/" + maxEquippedPets +
-            " | Income: " + GetCoinsPerMinute() +
-            " coins/minute"
-        );
+        return result;
+    }
+
+    public void UpdateAllUI()
+    {
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.UpdateInventoryUI();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }
