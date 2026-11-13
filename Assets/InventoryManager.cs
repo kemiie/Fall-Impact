@@ -28,11 +28,15 @@ public class InventoryManager : MonoBehaviour
     public Button openInventoryButton;
     public Button closeInventoryButton;
 
-    [Header("Inventory UI")]
+    [Header("Pet UI")]
     public TMP_Text inventoryText;
     public TMP_Text petIncomeText;
+    public TMP_Text unclaimedCoinsText;
 
-    [Header("Pet Buttons")]
+    [Header("Claim Button")]
+    public Button claimButton;
+
+    [Header("Pet Display")]
     public Transform petButtonContainer;
     public Button petButtonPrefab;
 
@@ -65,6 +69,9 @@ public class InventoryManager : MonoBehaviour
         if (closeInventoryButton != null)
             closeInventoryButton.onClick.AddListener(CloseInventory);
 
+        if (claimButton != null)
+            claimButton.onClick.AddListener(ClaimPetCoins);
+
         UpdateInventoryUI();
     }
 
@@ -87,40 +94,55 @@ public class InventoryManager : MonoBehaviour
         PetManager manager = PetManager.Instance;
 
         if (manager == null)
-        {
-            Debug.LogError("[INVENTORY] PetManager not found!");
             return;
-        }
-
-        Debug.Log(
-            "[INVENTORY] Owned pets: " +
-            manager.petNames.Count
-        );
 
         if (inventoryText != null)
-        {
-            inventoryText.text =
-                manager.GetPetCollectionText();
-        }
-        else
-        {
-            Debug.LogError(
-                "[INVENTORY] Inventory Text is not assigned!"
-            );
-        }
+            inventoryText.text = manager.GetPetCollectionText();
+
+        CreatePetButtons();
+
+        UpdateIncomeUI();
+    }
+
+    // Updates the money and income displays.
+    public void UpdateIncomeUI()
+    {
+        PetManager manager = PetManager.Instance;
+
+        if (manager == null)
+            return;
 
         if (petIncomeText != null)
         {
             petIncomeText.text =
-                "EQUIPPED: " +
-                manager.GetEquippedCount() +
-                " / " + manager.maxEquippedPets +
-                "\nINCOME: " +
+                "TOTAL INCOME: " +
                 manager.GetCoinsPerMinute() +
                 " COINS PER MINUTE";
         }
 
-        CreatePetButtons();
+        if (unclaimedCoinsText != null)
+        {
+            unclaimedCoinsText.text =
+                "UNCLAIMED COINS: " +
+                manager.GetClaimableCoins();
+        }
+
+        if (claimButton != null)
+        {
+            claimButton.interactable =
+                manager.GetClaimableCoins() > 0;
+        }
+    }
+
+    // CLAIM BUTTON
+    public void ClaimPetCoins()
+    {
+        if (PetManager.Instance == null)
+            return;
+
+        PetManager.Instance.ClaimCoins();
+
+        UpdateIncomeUI();
     }
 
     private void CreatePetButtons()
@@ -130,21 +152,9 @@ public class InventoryManager : MonoBehaviour
         if (manager == null)
             return;
 
-        if (petButtonContainer == null)
-        {
-            Debug.LogError(
-                "[INVENTORY] Pet Button Container is missing!"
-            );
+        if (petButtonContainer == null ||
+            petButtonPrefab == null)
             return;
-        }
-
-        if (petButtonPrefab == null)
-        {
-            Debug.LogError(
-                "[INVENTORY] Pet Button Prefab is missing!"
-            );
-            return;
-        }
 
         foreach (GameObject button in generatedButtons)
         {
@@ -168,85 +178,23 @@ public class InventoryManager : MonoBehaviour
             TMP_Text buttonText =
                 newButton.GetComponentInChildren<TMP_Text>();
 
-            RefreshButtonText(
-                buttonText,
-                manager,
-                petIndex
-            );
-
-            newButton.interactable = true;
-
-            newButton.onClick.RemoveAllListeners();
-
-            newButton.onClick.AddListener(() =>
+            if (buttonText != null)
             {
-                Debug.Log(
-                    "[BUTTON TEST] PET BUTTON CLICKED! " +
-                    manager.petNames[petIndex]
-                );
+                string petName = manager.petNames[petIndex];
 
-                PetManager current = PetManager.Instance;
+                int rarity = manager.petRarities[petIndex];
 
-                if (current == null)
-                {
-                    Debug.LogError(
-                        "[BUTTON ERROR] PetManager is missing!"
-                    );
-                    return;
-                }
+                int income = manager.GetPetIncome(rarity);
 
-                if (petIndex < 0 ||
-                    petIndex >= current.petNames.Count)
-                {
-                    Debug.LogError(
-                        "[BUTTON ERROR] Invalid pet index!"
-                    );
-                    return;
-                }
+                buttonText.text =
+                    petName + "\n" +
+                    manager.GetRarityName(rarity) + "\n" +
+                    "+" + income + " COINS / MIN";
+            }
 
-                if (current.equippedPets[petIndex])
-                {
-                    current.UnequipPet(petIndex);
-                }
-                else
-                {
-                    current.EquipPet(petIndex);
-                }
-
-                UpdateInventoryUI();
-            });
+            // Pet buttons are display-only.
+            newButton.interactable = false;
         }
-
-        Debug.Log(
-            "[INVENTORY] Created " +
-            generatedButtons.Count +
-            " pet buttons."
-        );
-    }
-
-    private void RefreshButtonText(
-        TMP_Text buttonText,
-        PetManager manager,
-        int index)
-    {
-        if (buttonText == null)
-        {
-            Debug.LogError(
-                "[INVENTORY] Button has no TMP text child!"
-            );
-            return;
-        }
-
-        string petName = manager.petNames[index];
-
-        string rarity =
-            manager.GetRarityName(manager.petRarities[index]);
-
-        bool equipped = manager.equippedPets[index];
-
-        buttonText.text =
-            petName + " (" + rarity + ")\n" +
-            (equipped ? "UNEQUIP" : "EQUIP");
     }
 
     public bool AddItem(string itemName, string itemType)
@@ -279,6 +227,9 @@ public class InventoryManager : MonoBehaviour
 
         if (closeInventoryButton != null)
             closeInventoryButton.onClick.RemoveListener(CloseInventory);
+
+        if (claimButton != null)
+            claimButton.onClick.RemoveListener(ClaimPetCoins);
 
         if (Instance == this)
             Instance = null;

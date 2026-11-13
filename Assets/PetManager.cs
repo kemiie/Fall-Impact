@@ -9,12 +9,11 @@ public class PetManager : MonoBehaviour
     [Header("Owned Pets")]
     public List<string> petNames = new List<string>();
     public List<int> petRarities = new List<int>();
-    public List<bool> equippedPets = new List<bool>();
 
-    [Header("Settings")]
-    public int maxEquippedPets = 3;
+    [Header("Money")]
+    public double unclaimedCoins = 0;
 
-    private float coinTimer;
+    private float uiTimer;
 
     private void Awake()
     {
@@ -30,23 +29,18 @@ public class PetManager : MonoBehaviour
 
     private void Update()
     {
-        if (GetCoinsPerMinute() <= 0)
-            return;
+        // ALL owned pets generate money automatically.
+        unclaimedCoins += GetCoinsPerMinute() * Time.deltaTime / 60.0;
 
-        coinTimer += Time.deltaTime;
+        // Refresh UI once per second.
+        uiTimer += Time.deltaTime;
 
-        if (coinTimer >= 60f)
+        if (uiTimer >= 1f)
         {
-            int minutes = Mathf.FloorToInt(coinTimer / 60f);
-            coinTimer -= minutes * 60f;
+            uiTimer = 0f;
 
-            if (MoneySystem.Instance != null)
-            {
-                int reward = GetCoinsPerMinute() * minutes;
-                MoneySystem.Instance.money += reward;
-
-                Debug.Log("[PETS] Earned " + reward + " coins!");
-            }
+            if (InventoryManager.Instance != null)
+                InventoryManager.Instance.UpdateIncomeUI();
         }
     }
 
@@ -55,14 +49,8 @@ public class PetManager : MonoBehaviour
         while (petRarities.Count < petNames.Count)
             petRarities.Add(3);
 
-        while (equippedPets.Count < petNames.Count)
-            equippedPets.Add(false);
-
         while (petRarities.Count > petNames.Count)
             petRarities.RemoveAt(petRarities.Count - 1);
-
-        while (equippedPets.Count > petNames.Count)
-            equippedPets.RemoveAt(equippedPets.Count - 1);
     }
 
     public void AddPet(string petName, int rarity)
@@ -71,67 +59,10 @@ public class PetManager : MonoBehaviour
 
         petNames.Add(petName);
         petRarities.Add(rarity);
-        equippedPets.Add(false);
 
         Debug.Log("[PETS] Collected " + petName);
 
         UpdateAllUI();
-    }
-
-    public bool EquipPet(int index)
-    {
-        FixLists();
-
-        if (index < 0 || index >= petNames.Count)
-            return false;
-
-        if (equippedPets[index])
-            return false;
-
-        if (GetEquippedCount() >= maxEquippedPets)
-        {
-            Debug.Log("[PETS] Maximum equipped pets reached!");
-            return false;
-        }
-
-        equippedPets[index] = true;
-
-        Debug.Log("[PETS] Equipped " + petNames[index]);
-
-        UpdateAllUI();
-        return true;
-    }
-
-    public void UnequipPet(int index)
-    {
-        FixLists();
-
-        if (index < 0 || index >= petNames.Count)
-            return;
-
-        if (!equippedPets[index])
-            return;
-
-        equippedPets[index] = false;
-
-        Debug.Log("[PETS] Unequipped " + petNames[index]);
-
-        UpdateAllUI();
-    }
-
-    public int GetEquippedCount()
-    {
-        FixLists();
-
-        int count = 0;
-
-        foreach (bool equipped in equippedPets)
-        {
-            if (equipped)
-                count++;
-        }
-
-        return count;
     }
 
     public int GetCoinsPerMinute()
@@ -142,9 +73,6 @@ public class PetManager : MonoBehaviour
 
         for (int i = 0; i < petNames.Count; i++)
         {
-            if (!equippedPets[i])
-                continue;
-
             switch (petRarities[i])
             {
                 case 3: total += 3; break;
@@ -156,6 +84,39 @@ public class PetManager : MonoBehaviour
         }
 
         return total;
+    }
+
+    public int GetClaimableCoins()
+    {
+        return Mathf.FloorToInt((float)unclaimedCoins);
+    }
+
+    public void ClaimCoins()
+    {
+        int reward = GetClaimableCoins();
+
+        if (reward <= 0)
+            return;
+
+        if (MoneySystem.Instance == null)
+        {
+            Debug.LogError("[PETS] MoneySystem not found!");
+            return;
+        }
+
+        MoneySystem.Instance.money += reward;
+
+        CharacterRewardBoard board =
+    FindObjectOfType<CharacterRewardBoard>();
+
+        if (board != null)
+            board.UpdateCoinText();
+
+        unclaimedCoins -= reward;
+
+        Debug.Log("[PETS] Claimed " + reward + " coins!");
+
+        UpdateAllUI();
     }
 
     public string GetRarityName(int rarity)
@@ -171,6 +132,19 @@ public class PetManager : MonoBehaviour
         }
     }
 
+    public int GetPetIncome(int rarity)
+    {
+        switch (rarity)
+        {
+            case 3: return 3;
+            case 4: return 5;
+            case 5: return 10;
+            case 6: return 20;
+            case 7: return 30;
+            default: return 0;
+        }
+    }
+
     public string GetPetCollectionText()
     {
         FixLists();
@@ -183,7 +157,9 @@ public class PetManager : MonoBehaviour
         for (int i = 0; i < petNames.Count; i++)
         {
             result += petNames[i] + "\n";
-            result += GetRarityName(petRarities[i]) + "\n\n";
+            result += GetRarityName(petRarities[i]) + "\n";
+            result += "+" + GetPetIncome(petRarities[i]) +
+                      " COINS PER MINUTE\n\n";
         }
 
         return result;

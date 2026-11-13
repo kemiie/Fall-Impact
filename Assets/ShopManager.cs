@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -173,11 +174,7 @@ public class ShopManager : MonoBehaviour
         // ADD PET TO COLLECTION
         PetManager manager = PetManager.Instance;
 
-        if (manager == null)
-        {
-            Debug.LogError("[SHOP] PetManager.Instance is NULL!");
-        }
-        else
+        if (manager != null)
         {
             manager.AddPet(petName, rarity);
 
@@ -185,6 +182,25 @@ public class ShopManager : MonoBehaviour
                 "[SHOP SUCCESS] Added " + petName +
                 " | Rarity: " + rarity +
                 " | Total owned: " + manager.petNames.Count
+            );
+        }
+        else
+        {
+            Debug.LogError("[SHOP] PetManager not found!");
+        }
+
+        // ADD INSTANT REWARD TO CHARACTER REWARD BOARD
+        CharacterRewardBoard rewardBoard =
+            FindFirstObjectByType<CharacterRewardBoard>();
+
+        if (rewardBoard != null)
+        {
+            rewardBoard.AddPulledCharacter(petName, rarity);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[SHOP] CharacterRewardBoard not found!"
             );
         }
 
