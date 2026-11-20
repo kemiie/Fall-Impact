@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Text;
+using UnityEditor;
 
 public class ShopManager : MonoBehaviour
 {
@@ -36,7 +37,7 @@ public class ShopManager : MonoBehaviour
 
     [Header("Wish Prices")]
     public int singleWishPrice = 100;
-    public int tenWishPrice = 1000;
+    public int fiveWishPrice = 1000;
 
     [Header("Pity Settings")]
     public int fiveStarPityLimit = 50;
@@ -113,12 +114,12 @@ public class ShopManager : MonoBehaviour
 
     public void TenWish()
     {
-        if (!SpendMoney(tenWishPrice))
+        if (!SpendMoney(fiveWishPrice))
             return;
 
         StringBuilder results = new StringBuilder();
 
-        results.AppendLine("TEN WISHES");
+        results.AppendLine("FIVE WISHES");
         results.AppendLine();
 
         for (int i = 0; i < 10; i++)

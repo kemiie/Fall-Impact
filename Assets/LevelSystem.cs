@@ -18,6 +18,9 @@ public class LevelSystem : MonoBehaviour
 
     [Header("Level Rewards")]
     public int level2Reward = 200;
+    public int level3Reward = 300;
+    public int level4Reward = 500;
+    public int level5Reward = 700;
 
     private bool level2RewardClaimed = false;
 
@@ -36,7 +39,14 @@ public class LevelSystem : MonoBehaviour
 
     public Slider expBar;
 
-    void Start()
+    [Header("Game Instructions")]
+    public TMP_Text instructionsText;
+    public Button helpButton;
+    public Button backToLevelButton;
+
+    private bool showingInstructions = false;
+
+    private void Start()
     {
         if (levelPanel != null)
             levelPanel.SetActive(false);
@@ -46,6 +56,12 @@ public class LevelSystem : MonoBehaviour
 
         if (closeButton != null)
             closeButton.onClick.AddListener(CloseLevelPanel);
+
+        if (helpButton != null)
+            helpButton.onClick.AddListener(ShowInstructions);
+
+        if (backToLevelButton != null)
+            backToLevelButton.onClick.AddListener(ShowLevelInfo);
 
         if (expBar != null)
             expBar.interactable = false;
@@ -58,6 +74,7 @@ public class LevelSystem : MonoBehaviour
         if (levelPanel != null)
             levelPanel.SetActive(true);
 
+        ShowLevelInfo();
         UpdateLevel();
     }
 
@@ -67,9 +84,63 @@ public class LevelSystem : MonoBehaviour
             levelPanel.SetActive(false);
     }
 
+    public void ShowInstructions()
+    {
+        showingInstructions = true;
+
+        if (instructionsText != null)
+        {
+            instructionsText.text =
+                "HOW TO PLAY\n\n" +
+
+                "WELCOME, ADVENTURER!\n" +
+                "Explore the world and become the strongest player!\n\n" +
+
+                "QUESTS\n" +
+                "Complete quests from NPCs to earn coins and EXP.\n\n" +
+
+                "PETS\n" +
+                "Summon pets using the gacha system. " +
+                "Your five strongest pets automatically follow you.\n\n" +
+
+                "PASSIVE INCOME\n" +
+                "All owned pets generate coins over time. " +
+                "Remember to claim your coins!\n\n" +
+
+                "TREASURE CHESTS\n" +
+                "Explore the world and collect hidden treasure chests.\n" +
+                "Return them to the Treasure Keeper for rewards.\n\n" +
+
+                "LEVELING\n" +
+                "Earn EXP to increase your level and receive rewards!\n\n" +
+
+                "GOOD LUCK ON YOUR ADVENTURE!";
+        }
+
+        if (helpButton != null)
+            helpButton.gameObject.SetActive(false);
+
+        if (backToLevelButton != null)
+            backToLevelButton.gameObject.SetActive(true);
+    }
+
+    public void ShowLevelInfo()
+    {
+        showingInstructions = false;
+
+        if (helpButton != null)
+            helpButton.gameObject.SetActive(true);
+
+        if (backToLevelButton != null)
+            backToLevelButton.gameObject.SetActive(false);
+
+        UpdateLevel();
+    }
+
     public void AddEXP(int amount)
     {
-        if (amount <= 0) return;
+        if (amount <= 0)
+            return;
 
         totalEXP += amount;
 
@@ -78,7 +149,8 @@ public class LevelSystem : MonoBehaviour
 
     public void AddCoins(int amount)
     {
-        if (amount <= 0) return;
+        if (amount <= 0)
+            return;
 
         if (MoneySystem.Instance != null)
             MoneySystem.Instance.money += amount;
@@ -88,7 +160,8 @@ public class LevelSystem : MonoBehaviour
 
     public bool SpendCoins(int amount)
     {
-        if (amount <= 0) return false;
+        if (amount <= 0)
+            return false;
 
         if (MoneySystem.Instance == null)
             return false;
@@ -126,9 +199,7 @@ public class LevelSystem : MonoBehaviour
             level2RewardClaimed = true;
 
             if (MoneySystem.Instance != null)
-            {
                 MoneySystem.Instance.money += level2Reward;
-            }
 
             Debug.Log("LEVEL 2 REWARD! +" +
                 level2Reward + " COINS!");
@@ -153,6 +224,9 @@ public class LevelSystem : MonoBehaviour
                 ? MoneySystem.Instance.money.ToString()
                 : "0";
         }
+
+        if (showingInstructions)
+            return;
 
         if (maxLevel)
         {
@@ -181,7 +255,8 @@ public class LevelSystem : MonoBehaviour
             nextRequirement - currentRequirement;
 
         if (expText != null)
-            expText.text = expIntoLevel + " / " + expNeeded + " EXP";
+            expText.text = expIntoLevel + " / " +
+                expNeeded + " EXP";
 
         if (currentEXPText != null)
             currentEXPText.text = expIntoLevel.ToString();
@@ -197,4 +272,20 @@ public class LevelSystem : MonoBehaviour
         if (expBar != null)
             expBar.value = (float)expIntoLevel / expNeeded;
     }
+
+    private void OnDestroy()
+    {
+        if (levelButton != null)
+            levelButton.onClick.RemoveListener(OpenLevelPanel);
+
+        if (closeButton != null)
+            closeButton.onClick.RemoveListener(CloseLevelPanel);
+
+        if (helpButton != null)
+            helpButton.onClick.RemoveListener(ShowInstructions);
+
+        if (backToLevelButton != null)
+            backToLevelButton.onClick.RemoveListener(ShowLevelInfo);
+    }
+
 }
