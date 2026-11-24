@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,12 +6,12 @@ public class TreasureOfferingQuest : MonoBehaviour
 {
     public static TreasureOfferingQuest Instance;
 
-    [Header("Quest Progress")]
+    [Header("Treasure Sigils")]
     public int totalChestsCollected = 0;
     public int chestsReturned = 0;
     public int maxChests = 100;
 
-    [Header("Milestones")]
+    [Header("Offering Milestones")]
     public int[] milestones =
     {
         5, 10, 20, 30, 40, 50, 75, 100
@@ -32,7 +31,7 @@ public class TreasureOfferingQuest : MonoBehaviour
         250, 300, 400, 600
     };
 
-    [Header("Quest UI")]
+    [Header("Offering UI")]
     public TMP_Text questText;
     public TMP_Text progressText;
     public Button returnButton;
@@ -58,7 +57,6 @@ public class TreasureOfferingQuest : MonoBehaviour
         UpdateQuestUI();
     }
 
-    // CALLED WHEN A CHEST IS COLLECTED.
     public void CollectChest()
     {
         if (totalChestsCollected >= maxChests)
@@ -66,15 +64,12 @@ public class TreasureOfferingQuest : MonoBehaviour
 
         totalChestsCollected++;
 
-        Debug.Log(
-            "CHESTS: " + totalChestsCollected +
-            "/" + maxChests
-        );
+        Debug.Log("[OFFERING] Treasure Sigil collected! " +
+            totalChestsCollected + "/" + maxChests);
 
         UpdateQuestUI();
     }
 
-    // CALLED WHEN THE PLAYER RETURNS CHESTS.
     public void ReturnChests()
     {
         if (nextMilestoneIndex >= milestones.Length)
@@ -87,30 +82,33 @@ public class TreasureOfferingQuest : MonoBehaviour
 
         int amountToReturn = required - chestsReturned;
 
-        chestsReturned += amountToReturn;
+        if (amountToReturn <= 0)
+            return;
 
         int coins = coinRewards[nextMilestoneIndex];
         int exp = expRewards[nextMilestoneIndex];
 
-        if (MoneySystem.Instance != null)
+        if (MoneySystem.Instance == null)
         {
-            MoneySystem.Instance.money += coins;
-        }
-        else
-        {
-            Debug.LogError("MoneySystem not found!");
+            Debug.LogError("[OFFERING] MoneySystem missing!");
+            return;
         }
 
-        if (FindObjectOfType<LevelSystem>() != null)
+        LevelSystem level =
+            FindObjectOfType<LevelSystem>();
+
+        if (level == null)
         {
-            FindObjectOfType<LevelSystem>().AddEXP(exp);
-        }
-        else
-        {
-            Debug.LogError("LevelSystem not found!");
+            Debug.LogError("[OFFERING] LevelSystem missing!");
+            return;
         }
 
-        Debug.Log("TREASURE MILESTONE COMPLETED!");
+        chestsReturned += amountToReturn;
+
+        MoneySystem.Instance.money += coins;
+        level.AddEXP(exp);
+
+        Debug.Log("[OFFERING] MILESTONE COMPLETED!");
         Debug.Log("+" + coins + " COINS");
         Debug.Log("+" + exp + " EXP");
 
@@ -126,13 +124,14 @@ public class TreasureOfferingQuest : MonoBehaviour
             if (questText != null)
             {
                 questText.text =
-                    "THE LOST TREASURE\n\n" +
-                    "You recovered every treasure chest!\n\n" +
-                    "QUEST COMPLETED!";
+                    "TREASURE OFFERING\n\n" +
+                    "All Treasure Sigils have been offered!\n\n" +
+                    "You have restored the ancient treasure collection!\n\n" +
+                    "ALL MILESTONES COMPLETED!";
             }
 
             if (progressText != null)
-                progressText.text = "100 / 100 CHESTS";
+                progressText.text = "100 / 100 SIGILS OFFERED";
 
             if (returnButton != null)
                 returnButton.interactable = false;
@@ -150,20 +149,31 @@ public class TreasureOfferingQuest : MonoBehaviour
         if (questText != null)
         {
             questText.text =
-                "THE LOST TREASURE\n\n" +
-                "Help the Treasure Keeper recover his lost chests!\n\n" +
-                "Next Offering: " + required + "\n" +
-                "Chests Needed: " + remaining + "\n\n" +
+                "TREASURE OFFERING\n\n" +
+
+                "TREASURE SIGILS\n" +
+                "Every treasure chest you discover gives you " +
+                "one Treasure Sigil.\n\n" +
+
+                "Offer your collected Sigils to receive " +
+                "magical rewards!\n\n" +
+
+                "NEXT OFFERING: " + required + " SIGILS\n" +
+                "SIGILS NEEDED: " + remaining + "\n\n" +
+
                 "REWARDS\n" +
                 coinRewards[nextMilestoneIndex] + " Coins\n" +
-                expRewards[nextMilestoneIndex] + " EXP";
+                expRewards[nextMilestoneIndex] + " EXP\n\n" +
+
+                "Collect more treasure chests to unlock " +
+                "the next offering reward!";
         }
 
         if (progressText != null)
         {
             progressText.text =
-                chestsReturned + " / " + maxChests +
-                " CHESTS RETURNED";
+                totalChestsCollected + " / " +
+                required + " SIGILS COLLECTED";
         }
 
         if (returnButton != null)

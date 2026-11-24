@@ -2,11 +2,19 @@ using UnityEngine;
 
 public class TreasureChest : MonoBehaviour
 {
-    [Header("Chest Settings")]
     public float interactionDistance = 4f;
 
     private Transform player;
     private bool collected = false;
+
+    private TreasureChestSpawner spawner;
+    private int bonusIndex = -1;
+
+    public void Initialize(TreasureChestSpawner owner, int index)
+    {
+        spawner = owner;
+        bonusIndex = index;
+    }
 
     private void Start()
     {
@@ -16,7 +24,7 @@ public class TreasureChest : MonoBehaviour
         if (playerObject != null)
             player = playerObject.transform;
         else
-            Debug.LogError("Player tag not found!");
+            Debug.LogError("[CHEST] Player tag missing!");
     }
 
     private void Update()
@@ -41,19 +49,33 @@ public class TreasureChest : MonoBehaviour
         if (collected)
             return;
 
-        if (TreasureOfferingQuest.Instance == null)
+        if (QuestManager.Instance == null)
+            return;
+
+        if (!QuestManager.Instance.firstQuestCompleted)
         {
-            Debug.LogError(
-                "TreasureOfferingQuest is missing!"
-            );
+            Debug.Log("Complete the crystal quest first!");
             return;
         }
 
         collected = true;
 
-        TreasureOfferingQuest.Instance.CollectChest();
+        if (!QuestManager.Instance.secondQuestCompleted)
+        {
+            QuestManager.Instance.CollectChest();
+        }
 
-        Debug.Log("CHEST COLLECTED!");
+        if (TreasureOfferingQuest.Instance != null)
+        {
+            TreasureOfferingQuest.Instance.CollectChest();
+        }
+
+        if (bonusIndex >= 0 && spawner != null)
+        {
+            spawner.BonusChestCollected(bonusIndex);
+        }
+
+        Debug.Log("[CHEST] Collected!");
 
         Destroy(gameObject);
     }
