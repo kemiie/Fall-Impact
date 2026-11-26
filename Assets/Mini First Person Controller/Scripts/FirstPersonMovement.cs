@@ -1,44 +1,76 @@
-﻿using System.Collections.Generic;
+﻿
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class FirstPersonMovement : MonoBehaviour
 {
-    public float speed = 5;
+    [Header("Movement")]
+    public float speed = 5f;
 
     [Header("Running")]
     public bool canRun = true;
-    public bool IsRunning { get; private set; }
-    public float runSpeed = 9;
+    public float runSpeed = 9f;
     public KeyCode runningKey = KeyCode.LeftShift;
 
-    Rigidbody rigidbody;
-    /// <summary> Functions to override movement speed. Will use the last added override. </summary>
-    public List<System.Func<float>> speedOverrides = new List<System.Func<float>>();
+    public bool IsRunning { get; private set; }
 
+    private Rigidbody rb;
+    private Vector2 movementInput;
 
+    public List<Func<float>> speedOverrides =
+        new List<Func<float>>();
 
-    void Awake()
+    private void Awake()
     {
-        // Get the rigidbody on this.
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        // Update IsRunning from input.
-        IsRunning = canRun && Input.GetKey(runningKey);
-
-        // Get targetMovingSpeed.
-        float targetMovingSpeed = IsRunning ? runSpeed : speed;
-        if (speedOverrides.Count > 0)
+        // Don't move while a menu is open.
+        if (UIManager.Instance != null &&
+            UIManager.Instance.IsPanelOpen())
         {
-            targetMovingSpeed = speedOverrides[speedOverrides.Count - 1]();
+            movementInput = Vector2.zero;
+            IsRunning = false;
+            return;
         }
 
-        // Get targetVelocity from input.
-        Vector2 targetVelocity =new Vector2( Input.GetAxis("Horizontal") * targetMovingSpeed, Input.GetAxis("Vertical") * targetMovingSpeed);
+        // Cursor lock does NOT disable movement.
+        movementInput = new Vector2(
+            Input.GetAxisRaw("Horizontal"),
+            Input.GetAxisRaw("Vertical")
+        );
 
-        // Apply movement.
-        rigidbody.linearVelocity = transform.rotation * new Vector3(targetVelocity.x, rigidbody.linearVelocity.y, targetVelocity.y);
+        movementInput = Vector2.ClampMagnitude(
+            movementInput, 1f
+        );
+
+        IsRunning = canRun && Input.GetKey(runningKey);
+    }
+
+    private void FixedUpdate()
+    {
+        if (rb == null || rb.isKinematic)
+            return;
+
+        float targetSpeed = IsRunning ? runSpeed : speed;
+
+        if (speedOverrides.Count > 0)
+            targetSpeed = speedOverrides[speedOverrides.Count - 1]();
+
+        Vector3 direction =
+            transform.right * movementInput.x +
+            transform.forward * movementInput.y;
+
+        Vector3 velocity = direction * targetSpeed;
+
+        rb.linearVelocity = new Vector3(
+            velocity.x,
+            rb.linearVelocity.y,
+            velocity.z
+        );
     }
 }

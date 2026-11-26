@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class PetManager : MonoBehaviour
 {
@@ -11,17 +11,18 @@ public class PetManager : MonoBehaviour
 
     [Header("Equipped Pets")]
     public List<int> equippedPetIndices = new List<int>();
-    [Range(1, 7)]
     public int maxEquippedPets = 5;
 
     [Header("Pet Following")]
     public Transform player;
     public List<GameObject> petPrefabs = new List<GameObject>();
 
-    private List<GameObject> spawnedPets = new List<GameObject>();
+    private List<GameObject> spawnedPets =
+        new List<GameObject>();
 
     [Header("Pet Formation")]
     public float followDistance = 2f;
+    public float petSpacing = 1.5f;
     public float followSpeed = 5f;
 
     [Header("Money")]
@@ -48,7 +49,7 @@ public class PetManager : MonoBehaviour
 
     private void Update()
     {
-        // All owned pets generate income.
+        // ALL owned pets generate money.
         unclaimedCoins += GetCoinsPerMinute()
             * Time.deltaTime / 60.0;
 
@@ -70,15 +71,6 @@ public class PetManager : MonoBehaviour
 
     private void FixLists()
     {
-        if (petNames == null)
-            petNames = new List<string>();
-
-        if (petRarities == null)
-            petRarities = new List<int>();
-
-        if (equippedPetIndices == null)
-            equippedPetIndices = new List<int>();
-
         while (petRarities.Count < petNames.Count)
             petRarities.Add(3);
 
@@ -91,11 +83,12 @@ public class PetManager : MonoBehaviour
         FixLists();
 
         petNames.Add(petName);
-        petRarities.Add(Mathf.Clamp(rarity, 3, 7));
+        petRarities.Add(rarity);
 
         Debug.Log("[PETS] Collected " + petName);
 
         EquipBestPets();
+
         UpdateAllUI();
     }
 
@@ -110,14 +103,19 @@ public class PetManager : MonoBehaviour
         for (int i = 0; i < petNames.Count; i++)
             sortedIndices.Add(i);
 
-        // Highest rarity first.
         sortedIndices.Sort((a, b) =>
         {
-            return petRarities[b].CompareTo(petRarities[a]);
+            int result =
+                petRarities[b].CompareTo(petRarities[a]);
+
+            if (result != 0)
+                return result;
+
+            return b.CompareTo(a);
         });
 
         int amount = Mathf.Min(
-            Mathf.Clamp(maxEquippedPets, 1, 7),
+            maxEquippedPets,
             sortedIndices.Count
         );
 
@@ -128,29 +126,22 @@ public class PetManager : MonoBehaviour
 
         SpawnEquippedPets();
 
-        Debug.Log("[PETS] Equipped " + amount +
-            " best pets!");
+        Debug.Log("[PETS] Equipped " + amount + " best pets!");
     }
 
     private void SpawnEquippedPets()
     {
-        // Remove old pet objects.
+        // Remove previous pet objects.
         foreach (GameObject pet in spawnedPets)
         {
             if (pet != null)
-            {
-                pet.SetActive(false);
                 Destroy(pet);
-            }
         }
 
         spawnedPets.Clear();
 
         if (player == null)
-        {
-            Debug.LogWarning("[PETS] Player is not assigned!");
             return;
-        }
 
         foreach (int index in equippedPetIndices)
         {
@@ -159,6 +150,7 @@ public class PetManager : MonoBehaviour
 
             int rarity = petRarities[index];
 
+            // Prefab index uses rarity:
             // 3 = Common, 4 = Rare, 5 = Epic,
             // 6 = Legendary, 7 = Mythical.
             int prefabIndex = rarity - 3;
@@ -244,7 +236,10 @@ public class PetManager : MonoBehaviour
     {
         int reward = GetClaimableCoins();
 
-        if (reward <= 0 || MoneySystem.Instance == null)
+        if (reward <= 0)
+            return;
+
+        if (MoneySystem.Instance == null)
             return;
 
         MoneySystem.Instance.money += reward;
@@ -297,14 +292,10 @@ public class PetManager : MonoBehaviour
 
         for (int i = 0; i < petNames.Count; i++)
         {
-            bool equipped = equippedPetIndices.Contains(i);
-
             result += petNames[i] + "\n";
             result += GetRarityName(petRarities[i]) + "\n";
-            result += "+" + GetPetIncome(petRarities[i])
-                + " COINS PER MIN\n";
-
-            result += equipped ? "EQUIPPED\n\n" : "NOT EQUIPPED\n\n";
+            result += "+" + GetPetIncome(petRarities[i]) +
+                " COINS PER MIN\n\n";
         }
 
         return result;

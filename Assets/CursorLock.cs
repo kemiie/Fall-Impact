@@ -1,23 +1,64 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CursorLock : MonoBehaviour
 {
-    void Start()
+    public static CursorLock Instance;
+
+    private void Awake()
     {
-        SetLock(true);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
     }
 
-    void Update()
+    private void Start()
+    {
+        LockCursor();
+    }
+
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SetLock(Cursor.lockState != CursorLockMode.Locked);
+            if (UIManager.Instance != null &&
+                UIManager.Instance.IsPanelOpen())
+            {
+                UIManager.Instance.CloseCurrentPanel();
+            }
+            else
+            {
+                UnlockCursor();
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current != null &&
+                EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            if (UIManager.Instance == null ||
+                !UIManager.Instance.IsPanelOpen())
+            {
+                LockCursor();
+            }
         }
     }
 
-    void SetLock(bool locked)
+    public void LockCursor()
     {
-        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !locked;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

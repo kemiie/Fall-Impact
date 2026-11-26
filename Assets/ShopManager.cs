@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -5,6 +6,9 @@ using System.Text;
 
 public class ShopManager : MonoBehaviour
 {
+    public static System.Action<int> CoinsSpent;
+    public static System.Action<int> StarPulled;
+
     [Header("Shop UI")]
     public GameObject shopPanel;
     public Button openShopButton;
@@ -19,24 +23,30 @@ public class ShopManager : MonoBehaviour
 
     [Header("Companions")]
     public string[] threeStarCompanions =
-        { "Bird", "Fish", "Monkey" };
+    {
+        "Bird", "Fish", "Monkey"
+    };
 
     public string[] fourStarCompanions =
-        { "Lizard", "Deer", "Rat" };
+    {
+        "Lizard", "Deer", "Rat"
+    };
 
     public string[] fiveStarCompanions =
-        { "Octopus", "Rainbow Bird", "Snake" };
+    {
+        "Octopus", "Rainbow Bird", "Snake"
+    };
 
-    [Header("Prices")]
+    [Header("Wish Prices")]
     public int singleWishPrice = 100;
     public int tenWishPrice = 1000;
 
-    [Header("Pity")]
+    [Header("Pity Settings")]
     public int fiveStarPityLimit = 50;
     public int fourStarPityLimit = 10;
 
-    private int wishesSinceFiveStar;
-    private int wishesSinceFourStar;
+    private int wishesSinceFiveStar = 0;
+    private int wishesSinceFourStar = 0;
 
     private void Start()
     {
@@ -76,17 +86,21 @@ public class ShopManager : MonoBehaviour
     {
         if (MoneySystem.Instance == null)
         {
-            Debug.LogError("[SHOP] MoneySystem missing!");
+            Debug.LogError("[SHOP] MoneySystem not found!");
             return false;
         }
 
         if (!MoneySystem.Instance.SpendMoney(amount))
         {
             if (resultText != null)
-                resultText.text = "NOT ENOUGH COINS!";
+                resultText.text = "Not enough coins!";
 
             return false;
         }
+
+        CoinsSpent?.Invoke(amount);
+
+        UpdateUI();
 
         return true;
     }
@@ -111,14 +125,12 @@ public class ShopManager : MonoBehaviour
 
         StringBuilder results = new StringBuilder();
 
-        results.AppendLine("TEN WISHES");
+        results.AppendLine("TEN WISHES!");
         results.AppendLine();
 
         for (int i = 0; i < 10; i++)
         {
-            results.AppendLine(
-                (i + 1) + ". " + RollReward()
-            );
+            results.AppendLine((i + 1) + ". " + RollReward());
             results.AppendLine();
         }
 
@@ -134,7 +146,7 @@ public class ShopManager : MonoBehaviour
         wishesSinceFourStar++;
 
         int rarity;
-        int chance = Random.Range(0, 100);
+        int chance = UnityEngine.Random.Range(0, 100);
 
         if (wishesSinceFiveStar >= fiveStarPityLimit)
             rarity = 5;
@@ -166,23 +178,33 @@ public class ShopManager : MonoBehaviour
         else
             petName = GetRandom(threeStarCompanions);
 
-        if (PetManager.Instance == null)
+        PetManager manager = PetManager.Instance;
+
+        if (manager != null)
         {
-            Debug.LogError("[SHOP] PetManager missing!");
-            return "ERROR: PET MANAGER MISSING";
+            manager.AddPet(petName, rarity);
+
+            Debug.Log(
+                "[SHOP] Added " + petName +
+                " | Rarity: " + rarity
+            );
+        }
+        else
+        {
+            Debug.LogError("[SHOP] PetManager not found!");
         }
 
-        PetManager.Instance.AddPet(petName, rarity);
+        StarPulled?.Invoke(rarity);
 
-        CharacterRewardBoard board =
-            FindObjectOfType<CharacterRewardBoard>();
+        CharacterRewardBoard rewardBoard =
+            FindFirstObjectByType<CharacterRewardBoard>();
 
-        if (board != null)
-            board.AddPulledCharacter(petName, rarity);
+        if (rewardBoard != null)
+            rewardBoard.AddPulledCharacter(petName, rarity);
 
-        return new string('*', rarity) +
-            "\n" + petName +
-            "\n" + PetManager.Instance.GetRarityName(rarity);
+        return new string('★', rarity) +
+            " " + rarity + " STAR\n" +
+            "COMPANION: " + petName;
     }
 
     private string GetRandom(string[] companions)
@@ -191,7 +213,7 @@ public class ShopManager : MonoBehaviour
             return "Mystery Companion";
 
         return companions[
-            Random.Range(0, companions.Length)
+            UnityEngine.Random.Range(0, companions.Length)
         ];
     }
 
@@ -199,10 +221,11 @@ public class ShopManager : MonoBehaviour
     {
         if (moneyText != null)
         {
-            moneyText.text = "Coins: " +
-                (MoneySystem.Instance != null
-                    ? MoneySystem.Instance.money
-                    : 0);
+            int balance = MoneySystem.Instance != null
+                ? MoneySystem.Instance.money
+                : 0;
+
+            moneyText.text = "Coins: " + balance;
         }
 
         if (pityText != null)

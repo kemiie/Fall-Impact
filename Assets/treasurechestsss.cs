@@ -1,35 +1,55 @@
+using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class TreasureChest : MonoBehaviour
 {
+    [Header("Interaction")]
+    public KeyCode interactKey = KeyCode.E;
     public float interactionDistance = 4f;
+    public Transform player;
 
-    private Transform player;
-    private bool collected = false;
+    [Header("Chest Visual")]
+    public GameObject chestVisual;
+    public GameObject promptObject;
+    public TMP_Text promptText;
 
-    private TreasureChestSpawner spawner;
-    private int bonusIndex = -1;
+    [Header("Respawn")]
+    public float respawnTime = 30f;
 
-    public void Initialize(TreasureChestSpawner owner, int index)
-    {
-        spawner = owner;
-        bonusIndex = index;
-    }
+    [Header("Rewards")]
+    public int minCoins = 10;
+    public int maxCoins = 50;
+    public int minEXP = 10;
+    public int maxEXP = 40;
+
+    [Header("Level System")]
+    public LevelSystem levelSystem;
+
+    private bool opened;
+    private bool playerNearby;
 
     private void Start()
     {
-        GameObject playerObject =
-            GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            GameObject foundPlayer =
+                GameObject.FindGameObjectWithTag("Player");
 
-        if (playerObject != null)
-            player = playerObject.transform;
-        else
-            Debug.LogError("[CHEST] Player tag missing!");
+            if (foundPlayer != null)
+                player = foundPlayer.transform;
+        }
+
+        if (levelSystem == null)
+            levelSystem = FindFirstObjectByType<LevelSystem>();
+
+        if (promptObject != null)
+            promptObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (collected || player == null)
+        if (opened || player == null)
             return;
 
         float distance = Vector3.Distance(
@@ -37,46 +57,77 @@ public class TreasureChest : MonoBehaviour
             transform.position
         );
 
-        if (distance <= interactionDistance &&
-            Input.GetKeyDown(KeyCode.E))
-        {
-            Collect();
-        }
+        playerNearby = distance <= interactionDistance;
+
+        if (promptObject != null)
+            promptObject.SetActive(playerNearby);
+
+        if (promptText != null && playerNearby)
+            promptText.text = "PRESS E TO OPEN CHEST";
+
+        if (!playerNearby)
+            return;
+
+        if (UIManager.Instance != null &&
+            UIManager.Instance.IsPanelOpen())
+            return;
+
+        if (Input.GetKeyDown(interactKey))
+            OpenChest();
     }
 
-    public void Collect()
+    public void OpenChest()
     {
-        if (collected)
+        if (opened)
             return;
 
-        if (QuestManager.Instance == null)
-            return;
+        opened = true;
 
-        if (!QuestManager.Instance.firstQuestCompleted)
+        if (promptObject != null)
+            promptObject.SetActive(false);
+
+        if (chestVisual != null)
+            chestVisual.SetActive(false);
+
+        GiveRewards();
+
+        StartCoroutine(RespawnChest());
+    }
+
+    private void GiveRewards()
+    {
+        int coins = Random.Range(minCoins, maxCoins + 1);
+        int exp = Random.Range(minEXP, maxEXP + 1);
+
+        if (MoneySystem.Instance != null)
         {
-            Debug.Log("Complete the crystal quest first!");
-            return;
+            MoneySystem.Instance.money += coins;
+
+            if (QuestManager.Instance != null)
+                QuestManager.Instance.EarnCoins(coins);
         }
 
-        collected = true;
+        if (levelSystem != null)
+            levelSystem.AddEXP(exp);
 
-        if (!QuestManager.Instance.secondQuestCompleted)
-        {
+        if (QuestManager.Instance != null)
             QuestManager.Instance.CollectChest();
-        }
 
-        if (TreasureOfferingQuest.Instance != null)
-        {
-            TreasureOfferingQuest.Instance.CollectChest();
-        }
+        Debug.Log(
+            "[CHEST OPENED] +" + coins +
+            " Coins | +" + exp + " EXP"
+        );
+    }
 
-        if (bonusIndex >= 0 && spawner != null)
-        {
-            spawner.BonusChestCollected(bonusIndex);
-        }
+    private IEnumerator RespawnChest()
+    {
+        yield return new WaitForSeconds(respawnTime);
 
-        Debug.Log("[CHEST] Collected!");
+        if (chestVisual != null)
+            chestVisual.SetActive(true);
 
-        Destroy(gameObject);
+        opened = false;
+
+        Debug.Log("[CHEST] Respawned!");
     }
 }
